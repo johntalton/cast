@@ -75,20 +75,47 @@ export class Cube {
   #depth
   #material
 
+  #min
+  #max
+
   constructor(center, width, height, depth) {
     this.#center = center
     this.#width = width
     this.#height = height
     this.#depth = depth
     this.#material = 'purple'
+
+    const dim = {
+      x: width / 2,
+      y: height / 2,
+      z: depth / 2
+    }
+    this.#min = Vector3D.subtract(center, dim)
+    this.#max = Vector3D.add(center, dim)
   }
 
   get material() { return this.#material }
   set material(material) { this.#material = material }
 
   intersections(ray) {
+    const inv = Vector3D.invert(ray.direction)
+    const min = Vector3D.multiply(Vector3D.subtract(this.#min, ray.origin), inv)
+    const max = Vector3D.multiply(Vector3D.subtract(this.#max, ray.origin), inv)
 
+    const minT = Vector3D.min(min, max)
+    const maxT = Vector3D.max(min, max)
 
+    const near = Math.max(minT.x, minT.y, minT.z)
+    const far = Math.min(maxT.x, maxT.y, maxT.z)
 
+    // console.log({ near, far })
+    // if(!Number.isFinite(near)) { return [] }
+    // if(!Number.isFinite(far)) { return [] }
+    if(near > far) { return [] }
+
+    return [
+      new Intersection3D(ray, near, this, false),
+      new Intersection3D(ray, far, this, false),
+    ]
   }
 }

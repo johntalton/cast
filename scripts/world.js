@@ -2,6 +2,9 @@ import { Cube, Sphere, Plane } from './objects.js'
 import { Direction3D  } from './cast.js'
 
 
+const cube1 = new Cube({ x: 10, y: 30, z: -190 }, 70, 30, 10)
+cube1.material = 'orchid'
+
 const circle1 = new Sphere({ x: -20, y: 20, z: -130 }, 30)
 circle1.material = 'green'
 
@@ -21,7 +24,14 @@ plane3.material = 'color-mix(in lab, pink, red)'
 
 
 export const WORLD = {
-  objects: [ circle1, circle2, circle3, plane, plane2, plane3 ],
+  objects: [
+    cube1,
+    circle1,
+    circle2,
+    circle3,
+    plane,
+    plane2,
+    plane3 ],
   lights: [ { x: -100, y: 300, z: -500 } ]
 }
 

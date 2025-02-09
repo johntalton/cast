@@ -2,27 +2,7 @@
 // [ cos(a) -sin(a) ]
 // [ sin(a)  cos(a) ]
 
-export class Vector3D {
-	static magnitude(v) {
-		return Math.sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z))
-	}
-
-	static add(v1, v2) {
-		return {
-			x: v1.x + v2.x,
-			y: v1.y + v2.y,
-			z: v1.z + v2.z
-		}
-	}
-
-	static subtract(v1, v2) {
-		return {
-			x: v1.x - v2.x,
-			y: v1.y - v2.y,
-			z: v1.z - v2.z
-		}
-	}
-
+export class Vector3DScalar {
 	static divide(v, divisor) {
 		return {
 			x: v.x / divisor,
@@ -39,11 +19,73 @@ export class Vector3D {
 		}
 	}
 
+	static magnitude(v) {
+		return Math.sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z))
+	}
+}
+
+export class Vector3D {
+	static add(v1, v2) {
+		return {
+			x: v1.x + v2.x,
+			y: v1.y + v2.y,
+			z: v1.z + v2.z
+		}
+	}
+
+	static subtract(v1, v2) {
+		return {
+			x: v1.x - v2.x,
+			y: v1.y - v2.y,
+			z: v1.z - v2.z
+		}
+	}
+
+	static divide(v1, v2) {
+		return {
+			x: v1.x / v2.x,
+			y: v1.y / v2.y,
+			z: v1.z / v2.z
+		}
+	}
+
+	static multiply(v1, v2) {
+		return {
+			x: v1.x * v2.x,
+			y: v1.y * v2.y,
+			z: v1.z * v2.z
+		}
+	}
+
 	static negate(v) {
 		return {
 			x: -v.x,
 			y: -v.y,
 			z: -v.z
+		}
+	}
+
+	static invert(v) {
+		return {
+			x: 1 / v.x,
+			y: 1 / v.y,
+			z: 1 / v.z
+		}
+	}
+
+	static min(v1, v2) {
+		return {
+			x: Math.min(v1.x, v2.x),
+			y: Math.min(v1.y, v2.y),
+			z: Math.min(v1.z, v2.z)
+		}
+	}
+
+	static max(v1, v2) {
+		return {
+			x: Math.max(v1.x, v2.x),
+			y: Math.max(v1.y, v2.y),
+			z: Math.max(v1.z, v2.z)
 		}
 	}
 
@@ -60,13 +102,13 @@ export class Vector3D {
 	}
 
 	static normalized(v) {
-		const m = Vector3D.magnitude(v)
+		const m = Vector3DScalar.magnitude(v)
 		if(m === 0) { return { ...v } }
-		return Vector3D.divide(v, m)
+		return Vector3DScalar.divide(v, m)
 	}
 
 	static distance(v1, v2) {
-    return Vector3D.magnitude(Vector3D.subtract(v2, v1))
+    return Vector3DScalar.magnitude(Vector3D.subtract(v2, v1))
 	}
 }
 
@@ -116,7 +158,7 @@ export class Ray3D {
 	get direction() { return this.#direction }
 
 	at(time) {
-		return Vector3D.add(this.#origin, Vector3D.multiply(this.#direction, time))
+		return Vector3D.add(this.#origin, Vector3DScalar.multiply(this.#direction, time))
 	}
 }
 
