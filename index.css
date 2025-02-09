@@ -1,0 +1,36 @@
+
+body {
+  background-color: grey;
+  margin: 0;
+}
+
+header > h1 {
+  margin: 0;
+  margin-block-end: 1ch;
+}
+
+main {
+  display: flex;
+  justify-content: center;
+}
+
+main[data-multi] {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  justify-items: center;
+}
+
+section {
+  display: flex;
+  width: 100%;
+
+  & >span {
+    position: absolute;
+  }
+
+  & > canvas {
+    background-color: white;
+    width: 100%;
+  }
+}
