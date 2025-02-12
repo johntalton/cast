@@ -1,4 +1,4 @@
-import { Direction3D, Intersection3D, Matrix3x3, Vector3D } from './cast.js'
+import { Direction3D, Intersection3D, Matrix3x3, Ray3D, Vector3D } from './cast.js'
 
 export class Object3D {
 	#material
@@ -17,10 +17,10 @@ export class Object3D {
 	}
 
 	colorAt(point) {
-		const { u, v } = this.uvAt(point)
+		const UV = this.uvAt(point)
 
 		const mapper = this.material.mapper
-		if(mapper) { return mapper(u, v) }
+		if(mapper) { return mapper(UV) }
 		return this.material.color
 	}
 
@@ -80,7 +80,18 @@ export class Sphere extends Object3D {
 	}
 
 	uvAt(point) {
-		return super.uvAt(point)
+		const p = Vector3D.normalized(Vector3D.subtract(point, this.#center))
+
+		// unwrap Y axis
+		// https://en.wikipedia.org/wiki/UV_mapping
+		const u = 0.5 + Math.atan2(p.z, p.x) / (2 * Math.PI)
+		const v = 0.5 - Math.asin(p.y) / Math.PI
+
+		// unwrap Z axis
+		// const u = (Math.atan2(d.y, d.x) + Math.PI) / 2 * Math.PI
+		// const v = (Math.asin(d.z) + Math.PI / 2) / Math.PI
+
+		return { u, v, normal: true }
 	}
 
 	intersections(ray) {

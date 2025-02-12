@@ -21,7 +21,7 @@ export const WORLD = {
 			radius: 30,
 			material: {
 				type: 'texture',
-				url: 'textures/IMG_0646 (1).JPG',
+				url: 'textures/EarthMap_2500x1250.jpg',
 				color: 'green'
 			}
 		},
@@ -30,7 +30,10 @@ export const WORLD = {
 			type: 'sphere',
 			center: { x: 70, y: -70, z: -140 },
 			radius: 30,
-			material: { color: [ 'blue' ] }
+			material: {
+				type: 'checker',
+				color: [ 'blue', 'navy' ]
+			}
 		},
 		{
 			name: 'C-sphere',
@@ -42,19 +45,18 @@ export const WORLD = {
 		{
 			name: 'D-sphere',
 			type: 'sphere',
-			center: { x: 40, y: -10, z: -200 },
-			radius: 20,
+			center: { x: 100, y: 50, z: -200 },
+			radius: 10,
 			material: { color: 'orange' }
 		},
 		{
 			name: 'E-sphere',
 			type: 'sphere',
-			center: { x: -80, y: 30, z: -300 },
+			center: { x: -80, y: 30, z: -40 },
 			radius: 20,
 			material: {
-				type: 'checker',
 				width: 10, height: 10,
-				color: [ 'lime', 'white' ]
+				color: [ 'lime', 'palegreen' ]
 			}
 		},
 		{
@@ -71,9 +73,13 @@ export const WORLD = {
 		{
 			name: 'B-plane',
 			type: 'plane',
-			center: { x: 100, y: 0, z: 0 },
+			center: { x: 100, y: 50, z: -200 },
 			normal: { x: -1, y: 0, z: 0 },
-			material: { color: 'color-mix(in lab, white 70%, blue)' }
+			material: {
+				type: 'texture',
+				url: 'textures/stones1.jpg',
+				color: 'color-mix(in lab, white 70%, blue)'
+			}
 		},
 		{
 			name: 'C-plane',

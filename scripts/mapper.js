@@ -4,9 +4,14 @@ export function checkerMapper(options) {
 	const checkerHeight = options?.height ?? 20
 	const [ oddColor, evenColor ] = Array.isArray(options?.color) ? options.color : [ options?.color ?? DEFAULT_COLOR, 'white' ]
 
-	return (u, v) => {
-		const normalU = Math.abs(Math.round(u / checkerWidth))
-		const normalV = Math.abs(Math.round(v / checkerHeight))
+	return uv => {
+		const { u, v, normal } = uv
+
+		const _u = normal ? (u * checkerWidth * 8) : u
+		const _v = normal ? (v * checkerHeight * 8) : v
+
+		const normalU = Math.abs(Math.round(_u / checkerWidth))
+		const normalV = Math.abs(Math.round(_v / checkerHeight))
 
 		return (normalU % 2 === normalV % 2) ? oddColor : evenColor
 	}
@@ -18,9 +23,18 @@ export async function textureMapper(options) {
 	function makeMapperFn(imageData) {
 		const { width, height, data } = imageData
 
-		return (u, v) => {
-			const _u = Math.abs(Math.round(u))
-			const _v = Math.abs(Math.round(v))
+		return uv => {
+			const { u, v, normal = false } = uv
+
+			const scaledU = normal ? (u * width) : u
+			const scaledV = normal ? (v * height) : v
+
+			const modU = Math.round(scaledU) % width
+			const modV = Math.round(scaledV) % height
+
+			const _u = (modU < 0) ? (width + modU) : modU
+			const _v = (modV < 0) ? (height + modV) : modV
+
 
 			const index = 4 * ((_v * width) + _u)
 			const r = data[index + 0]
@@ -28,7 +42,7 @@ export async function textureMapper(options) {
 			const b = data[index + 2]
 			const a = data[index + 3] / 255
 
-			return `rgb(${r} ${g} ${b})`
+			return `rgba(${r} ${g} ${b} / ${a})`
 		}
 	}
 
@@ -53,7 +67,7 @@ export async function textureMapper(options) {
 }
 
 export function colorMapper(options) {
-	return () => {
+	return uv => {
 		return (Array.isArray(options?.color) ? options.color[0] : options?.color) ?? DEFAULT_COLOR
 	}
 }
