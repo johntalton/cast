@@ -1,57 +1,87 @@
-import { Cube, Sphere, Plane } from './objects.js'
-import { Direction3D  } from './cast.js'
-
-
-const cube1 = new Cube({ x: 10, y: 30, z: -190 }, 70, 30, 10)
-cube1.material = 'orchid'
-
-const circle1 = new Sphere({ x: -20, y: 20, z: -130 }, 30)
-circle1.material = 'green'
-
-const circle2 = new Sphere({ x: 100, y: -50, z: -100}, 30)
-circle2.material = 'blue'
-
-const circle3 = new Sphere({ x: 0, y: 0, z: -30}, 20)
-circle3.material = 'yellow'
-
-const plane = new Plane({ x: 0, y: -100, z: 0 }, new Direction3D({ x: 0, y: 1, z: 0 }))
-
-const plane2 = new Plane({ x: 100, y: 0, z: 0 }, new Direction3D({ x: -1, y: 0, z: 0 }))
-plane2.material = 'pink'
-
-const plane3 = new Plane({ x: 0, y: 0, z: 50 }, new Direction3D({ x: 0, y: 0, z: -1 }))
-plane3.material = 'color-mix(in lab, pink, red)'
-
-
 export const WORLD = {
-  objects: [
-    cube1,
-    circle1,
-    circle2,
-    circle3,
-    plane,
-    plane2,
-    plane3 ],
-  lights: [ { x: -100, y: 300, z: -500 } ]
+	objects: [
+		{
+			name: 'A-cube',
+			type: 'cube',
+			center: { x: -10, y: 15, z: -155 },
+			width: 70, height: 30, depth: 10,
+			material: { color: 'orchid' }
+		},
+		{
+			name: 'B-cube',
+			type: 'cube',
+			center: { x: 50, y: 30, z: -60 },
+			width: 20, height: 120, depth: 20,
+			material: { color: 'purple' }
+		},
+		{
+			name: 'A-sphere',
+			type: 'sphere',
+			center: { x: -20, y: -30, z: -110 },
+			radius: 30,
+			material: {
+				type: 'texture',
+				url: 'textures/IMG_0646 (1).JPG',
+				color: 'green'
+			}
+		},
+		{
+			name: 'B-sphere',
+			type: 'sphere',
+			center: { x: 70, y: -70, z: -140 },
+			radius: 30,
+			material: { color: [ 'blue' ] }
+		},
+		{
+			name: 'C-sphere',
+			type: 'sphere',
+			center: { x: 0, y: 0, z: -30 },
+			radius: 20,
+			material: { color: 'yellow' }
+		},
+		{
+			name: 'D-sphere',
+			type: 'sphere',
+			center: { x: 40, y: -10, z: -200 },
+			radius: 20,
+			material: { color: 'orange' }
+		},
+		{
+			name: 'E-sphere',
+			type: 'sphere',
+			center: { x: -80, y: 30, z: -300 },
+			radius: 20,
+			material: {
+				type: 'checker',
+				width: 10, height: 10,
+				color: [ 'lime', 'white' ]
+			}
+		},
+		{
+			name: 'A-plane',
+			type: 'plane',
+			center: { x: 0, y: -100, z: 0 },
+			normal: { x: 0, y: 1, z: 0 },
+			material: {
+				type: 'checker',
+				width: 20, height: 50,
+				color: [ 'color-mix(in lab, white 70%, red)', 'white' ]
+			}
+		},
+		{
+			name: 'B-plane',
+			type: 'plane',
+			center: { x: 100, y: 0, z: 0 },
+			normal: { x: -1, y: 0, z: 0 },
+			material: { color: 'color-mix(in lab, white 70%, blue)' }
+		},
+		{
+			name: 'C-plane',
+			type: 'plane',
+			center: { x: 0, y: 0, z: 70 },
+			normal: { x: 0, y: 1, z: -1 },
+			material: { type: 'checker', color: 'color-mix(in lab, white 70%, black)' }
+		}
+	],
+	lights: [{ x: -300, y: 300, z: -500 }]
 }
-
-
-// const circle1 = new Sphere({ x: 0, y: 0, z: -100 }, 40)
-// circle1.material = 'red' // 'rgb(255 81 91)' // red
-
-// const circle2 = new Sphere({ x: 50, y: 30, z: -50}, 20)
-// circle2.material = 'yellow' // 'rgb(229 193 117)' // 0.9, 0.76, 0.46
-
-// const circle3 = new Sphere({ x: 50, y: 0, z: -150}, 30)
-// circle3.material = 'blue' // 'rgb(165 196 247)'
-
-// const circle4 = new Sphere({ x: -55, y: 0, z: -50}, 30)
-// circle4.material = 'lightgrey' // 'rgb(22 22 22)'
-
-// const plane = new Plane({ x: 0, y: -50, z: 0 }, new Direction3D({ x: 0, y: 1, z: 0 }))
-// plane.material = 'green'
-
-// export const WORLD = {
-//   objects: [ circle1, circle2, circle3, circle4, plane ],
-//   lights: [ { x: 0, y: 300, z: -500 } ]
-// }

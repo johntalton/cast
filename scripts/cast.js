@@ -1,6 +1,3 @@
-// roation
-// [ cos(a) -sin(a) ]
-// [ sin(a)  cos(a) ]
 
 export class Vector3DScalar {
 	static divide(v, divisor) {
@@ -21,6 +18,10 @@ export class Vector3DScalar {
 
 	static magnitude(v) {
 		return Math.sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z))
+	}
+
+	static magnitudeSquared(v) {
+		return (v.x * v.x) + (v.y * v.y) + (v.z * v.z)
 	}
 }
 
@@ -112,6 +113,93 @@ export class Vector3D {
 	}
 }
 
+export class Matrix3x3 {
+
+	static alignment(v1, target) {
+		// https://gist.github.com/kevinmoran/b45980723e53edeb8a5a43c49f134724
+		const axis = Vector3D.crossProduct(target, v1) // swapped
+		const cosA = Vector3D.dotProduct(v1, target)
+		const k = 1 / (1 + cosA)
+
+		return [
+			[(axis.x * axis.x * k) + cosA, (axis.y * axis.x * k) - axis.z, (axis.z * axis.x * k) + axis.y],
+			[(axis.x * axis.y * k) + axis.z, (axis.y * axis.y * k) + cosA, (axis.z * axis.y * k) - axis.x],
+			[(axis.x * axis.z * k) - axis.y, (axis.y * axis.z * k) + axis.x, (axis.z * axis.z * k) + cosA],
+		]
+	}
+
+	static alignmentSlow(v1, target) {
+		const axis = Vector3D.normalized(Vector3D.crossProduct(target, v1)) // swapped
+		const dot = Vector3D.dotProduct(v1, target) // clamp?
+		const angleRadians = Math.acos(dot)
+		return Matrix3x3.rotateAroundAxis(axis, angleRadians)
+	}
+
+
+	static rotateAroundAxis(axis, radians) {
+		const sinA = Math.sin(radians)
+		const cosA = Math.cos(radians)
+		const oneMinusCosA = 1 - cosA
+
+		return [
+			[
+				(axis.x * axis.x * oneMinusCosA) + cosA,
+				(axis.y * axis.x * oneMinusCosA) - (sinA * axis.z),
+				(axis.z * axis.x * oneMinusCosA) + (sinA * axis.y),
+			],
+			[
+				(axis.x * axis.y * oneMinusCosA) + (sinA * axis.z),
+				(axis.y * axis.y * oneMinusCosA) + cosA,
+				(axis.z * axis.y * oneMinusCosA) - (sinA * axis.x),
+
+			],
+			[
+				(axis.x * axis.z * oneMinusCosA) - (sinA * axis.y),
+				(axis.y * axis.z * oneMinusCosA) + (sinA * axis.x),
+				(axis.z * axis.z * oneMinusCosA) + cosA
+			]
+		]
+	}
+
+	static rotateX(angle) {
+		const sinA = Math.sin(angle)
+		const cosA = Math.cos(angle)
+		return [
+			[ 1,    0,     0 ],
+			[ 0, cosA, -sinA ],
+			[ 0, sinA,  cosA ]
+		]
+	}
+
+	static rotateY(angle) {
+		const sinA = Math.sin(angle)
+		const cosA = Math.cos(angle)
+		return [
+			[  cosA, 0, sinA ],
+			[  0,    1,    0 ],
+			[ -sinA, 0, cosA ]
+		]
+	}
+
+	static rotateZ(angle) {
+		const sinA = Math.sin(angle)
+		const cosA = Math.cos(angle)
+		return [
+			[ cosA, -sinA, 0 ],
+			[ sinA,  cosA, 0 ],
+			[ 0,        0, 1 ]
+		]
+	}
+
+	static multiply(matrix, v) {
+		return {
+			x: v.x * matrix[0][0] + v.y * matrix[1][0] + v.z * matrix[2][0],
+			y: v.x * matrix[0][1] + v.y * matrix[1][1] + v.z * matrix[2][1],
+			z: v.x * matrix[0][2] + v.y * matrix[1][2] + v.z * matrix[2][2],
+		}
+	}
+}
+
 export class Direction3D {
 	#vector
 
@@ -180,6 +268,14 @@ export class Intersection3D {
 
 	get at() {
 		return this.#ray.at(this.distance)
+	}
+
+	get color() {
+		return this.#object.colorAt(this.at)
+	}
+
+	get normal() {
+		return this.#object.normalAt(this.at)
 	}
 }
 

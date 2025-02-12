@@ -1,121 +1,167 @@
-import { Intersection3D, Vector3D } from './cast.js'
+import { Direction3D, Intersection3D, Matrix3x3, Vector3D } from './cast.js'
 
-export class Plane {
-  #center
-  #normal
-  #material
+export class Object3D {
+	#material
 
-  constructor(center, normal) {
-    this.#center = center
-    this.#normal = normal
-    this.#material = 'red'
-  }
+	constructor({ material }) { this.#material = material ?? { color: 'red' } }
 
-  get material() { return this.#material }
-  set material(material) { this.#material = material }
+	get material() { return this.#material }
+	set material(material) { this.#material = material }
 
-  intersections(ray) {
-    const denominator = Vector3D.dotProduct(this.#normal, ray.direction)
-    if(Math.abs(denominator) < 0.0001) { return [] }
+	normalAt(point) {
+		return new Direction3D({ x: 0, y: 0, z: 0 })
+	}
 
-    const diff = Vector3D.subtract(this.#center, ray.origin)
-    const t = Vector3D.dotProduct(diff, this.#normal) / denominator
+	uvAt(point) {
+		return { u: point.x, v: point.y }
+	}
 
-    // console.log({ t })
-    // if(t < 0) { return [] }
-    return [ new Intersection3D(ray, t, this, false) ]
-  }
+	colorAt(point) {
+		const { u, v } = this.uvAt(point)
+
+		const mapper = this.material.mapper
+		if(mapper) { return mapper(u, v) }
+		return this.material.color
+	}
+
+	intersection(ray) { return [] }
 }
 
-export class Sphere {
-  #center
-  #radius
-  #material
+export class Plane extends Object3D {
+	#center
+	#normal
 
-  constructor(center, radius) {
-    this.#center = center
-    this.#radius = radius
-    this.#material = 'green'
-  }
+	constructor(options) {
+		super(options)
 
-  get material() { return this.#material }
-  set material(material) { this.#material = material }
+		const { center, normal } = options
 
-  intersections(ray) {
-    const L = Vector3D.subtract(ray.origin, this.#center)
-    const a = Vector3D.dotProduct(ray.direction, ray.direction)
-    const b = 2 * Vector3D.dotProduct(L, ray.direction)
-    const c = Vector3D.dotProduct(L, L) - (this.#radius * this.#radius)
+		this.#center = center
+		this.#normal = new Direction3D(normal)
+	}
 
-    // quadratic
-    const discriminate = (b * b) - (4.0 * a * c)
-    if(discriminate < 0) { return [] }
+	normalAt(point) {
+		return this.#normal
+	}
 
-    if(discriminate === 0) {
-      const t = -b / (2 * a)
-      return [ new Intersection3D(ray, t, this, false) ]
-    }
+	uvAt(point) {
+		const normalPoint = Vector3D.subtract(point, this.#center)
+		const rotation = Matrix3x3.alignment(this.normalAt(point), new Direction3D({ x: 0, y: 0, z: -1 }))
+		const { x: u, y: v } = Matrix3x3.multiply(rotation, normalPoint)
+		return { u, v }
+	}
 
-    const t1 = (-b + Math.sqrt(discriminate)) / (2 * a)
-    const t2 = (-b - Math.sqrt(discriminate)) / (2 * a)
+	intersections(ray) {
+		const denominator = Vector3D.dotProduct(this.#normal, ray.direction)
+		if (Math.abs(denominator) < 0.0001) { return [] }
 
-    // console.log(t1, t2)
+		const diff = Vector3D.subtract(this.#center, ray.origin)
+		const t = Vector3D.dotProduct(diff, this.#normal) / denominator
 
-    return [
-      new Intersection3D(ray, t1, this, false),
-      new Intersection3D(ray, t2, this, false)
-    ]
-  }
+		return [new Intersection3D(ray, t, this, false)]
+	}
 }
 
-export class Cube {
-  #center
-  #width
-  #height
-  #depth
-  #material
+export class Sphere extends Object3D {
+	#center
+	#radius
 
-  #min
-  #max
+	constructor(options) {
+		super(options)
 
-  constructor(center, width, height, depth) {
-    this.#center = center
-    this.#width = width
-    this.#height = height
-    this.#depth = depth
-    this.#material = 'purple'
+		const { center, radius, material } = options
 
-    const dim = {
-      x: width / 2,
-      y: height / 2,
-      z: depth / 2
-    }
-    this.#min = Vector3D.subtract(center, dim)
-    this.#max = Vector3D.add(center, dim)
-  }
+		this.#center = center
+		this.#radius = radius
+	}
 
-  get material() { return this.#material }
-  set material(material) { this.#material = material }
+	normalAt(point) {
+		return Direction3D.from(this.#center, point)
+	}
 
-  intersections(ray) {
-    const inv = Vector3D.invert(ray.direction)
-    const min = Vector3D.multiply(Vector3D.subtract(this.#min, ray.origin), inv)
-    const max = Vector3D.multiply(Vector3D.subtract(this.#max, ray.origin), inv)
+	uvAt(point) {
+		return super.uvAt(point)
+	}
 
-    const minT = Vector3D.min(min, max)
-    const maxT = Vector3D.max(min, max)
+	intersections(ray) {
+		const L = Vector3D.subtract(ray.origin, this.#center)
+		const a = Vector3D.dotProduct(ray.direction, ray.direction)
+		const b = 2 * Vector3D.dotProduct(L, ray.direction)
+		const c = Vector3D.dotProduct(L, L) - (this.#radius * this.#radius)
 
-    const near = Math.max(minT.x, minT.y, minT.z)
-    const far = Math.min(maxT.x, maxT.y, maxT.z)
+		// quadratic
+		const discriminate = (b * b) - (4.0 * a * c)
+		if (discriminate < 0) { return [] }
 
-    // console.log({ near, far })
-    // if(!Number.isFinite(near)) { return [] }
-    // if(!Number.isFinite(far)) { return [] }
-    if(near > far) { return [] }
+		if (discriminate === 0) {
+			const t = -b / (2 * a)
+			return [new Intersection3D(ray, t, this, false)]
+		}
 
-    return [
-      new Intersection3D(ray, near, this, false),
-      new Intersection3D(ray, far, this, false),
-    ]
-  }
+		const t1 = (-b + Math.sqrt(discriminate)) / (2 * a)
+		const t2 = (-b - Math.sqrt(discriminate)) / (2 * a)
+
+		// console.log(t1, t2)
+
+		return [
+			new Intersection3D(ray, t1, this, false),
+			new Intersection3D(ray, t2, this, false)
+		]
+	}
+}
+
+export class Cube extends Object3D {
+	#center
+	#width
+	#height
+	#depth
+
+	#min
+	#max
+
+	constructor(options) {
+		super(options)
+
+		const { center, width, height, depth } = options
+
+		this.#center = center
+		this.#width = width
+		this.#height = height
+		this.#depth = depth
+
+		const dim = {
+			x: width / 2,
+			y: height / 2,
+			z: depth / 2
+		}
+		this.#min = Vector3D.subtract(center, dim)
+		this.#max = Vector3D.add(center, dim)
+	}
+
+	intersections(ray) {
+		const inv = Vector3D.invert(ray.direction)
+		const min = Vector3D.multiply(Vector3D.subtract(this.#min, ray.origin), inv)
+		const max = Vector3D.multiply(Vector3D.subtract(this.#max, ray.origin), inv)
+
+		const minT = Vector3D.min(min, max)
+		const maxT = Vector3D.max(min, max)
+
+		const near = Math.max(minT.x, minT.y, minT.z)
+		const far = Math.min(maxT.x, maxT.y, maxT.z)
+
+		// if(!Number.isFinite(near)) { return [] }
+		// if(!Number.isFinite(far)) { return [] }
+		if (near > far) { return [] }
+
+		return [
+			new Intersection3D(ray, near, this, false),
+			new Intersection3D(ray, far, this, false),
+		]
+	}
+}
+
+export const OBJECTS = {
+	'plane': Plane,
+	'sphere': Sphere,
+	'cube': Cube
 }

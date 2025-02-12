@@ -2,14 +2,15 @@
 import { Direction3D, Ray3D, Vector2D, Vector3D } from './cast.js'
 import { trace } from './trace.js'
 import { WORLD } from './world.js'
+import { OBJECTS } from './objects.js'
+import { DEFAULT_MAPPER, MAPPERS } from './mapper.js'
 
-function cast(width, height, camera, port) {
-	for(let w = 0; w < width; w += 1) {
-		for(let h = 0; h < height; h += 1) {
-
+function cast(world, width, height, camera, port) {
+	for(let h = 0; h < height; h += 1) {
+		for(let w = 0; w < width; w += 1) {
 			const { viewportOrigin, viewportFocus } = canvasToCameraViewport(camera, w, h, width, height)
 			const r = new Ray3D(viewportOrigin, Direction3D.from(viewportOrigin, viewportFocus))
-			const color = trace(WORLD, r, false)
+			const color = trace(world, r, false)
 
 			port.postMessage({
 				x: w, y: h, color
@@ -85,7 +86,7 @@ function canvasContext(name) {
 	return { canvas, context }
 }
 
-function initCanvas(canvas, context, camera) {
+function initCanvas(canvas, context, world, camera) {
 	const { port1, port2 } = new MessageChannel()
 
 	port2.start()
@@ -111,10 +112,10 @@ function initCanvas(canvas, context, camera) {
 		console.log(color)
 	})
 
-	cast(canvas.width, canvas.height, camera, port1)
+	cast(world, canvas.width, canvas.height, camera, port1)
 }
 
-function initCanvasWorld() {
+function initCanvasWorld(world) {
 	const { canvas,  context } = canvasContext('Canvas')
 
 	const cameraWorld = {
@@ -126,10 +127,10 @@ function initCanvasWorld() {
 		viewportWidth: 200, viewportHeight: 150
 	}
 
-	initCanvas(canvas, context, cameraWorld)
+	initCanvas(canvas, context, world, cameraWorld)
 }
 
-function initCanvasTop() {
+function initCanvasTop(world) {
 	const { canvas,  context } = canvasContext('CanvasTop')
 
 	const cameraTop = {
@@ -141,10 +142,10 @@ function initCanvasTop() {
 		viewportWidth: 200, viewportHeight: 150
 	}
 
-	initCanvas(canvas, context, cameraTop)
+	initCanvas(canvas, context, world, cameraTop)
 }
 
-function initCanvasFront() {
+function initCanvasFront(world) {
 	const { canvas,  context } = canvasContext('CanvasFront')
 
 	const cameraFront = {
@@ -156,10 +157,10 @@ function initCanvasFront() {
 		viewportWidth: 200, viewportHeight: 150
 	}
 
-	initCanvas(canvas, context, cameraFront)
+	initCanvas(canvas, context, world, cameraFront)
 }
 
-function initCanvasSide() {
+function initCanvasSide(world) {
 	const { canvas,  context } = canvasContext('CanvasSide')
 
 	const cameraSide = {
@@ -171,14 +172,40 @@ function initCanvasSide() {
 		viewportWidth: 200, viewportHeight: 150
 	}
 
-	initCanvas(canvas, context, cameraSide)
+	initCanvas(canvas, context, world, cameraSide)
 }
 
+async function futureWorld(options) {
+	return {
+		lights: options.lights,
+		objects: await Promise.all(options.objects.map(async objOptions => {
+			const maker = OBJECTS[objOptions.type ?? 'sphere']
+			const mapperType = objOptions.material?.type ?? DEFAULT_MAPPER
+			const mapperMaker = MAPPERS[mapperType]
+			return new maker({
+				...objOptions,
+				material: {
+					...objOptions.material,
+					mapper: await Promise.try(mapperMaker, objOptions.material)
+				}
+			})
+		}))
+	}
+}
+
+
 function onContentLoaded() {
-	initCanvasWorld()
-	initCanvasTop()
-	initCanvasFront()
-	initCanvasSide()
+	futureWorld(WORLD)
+		.then(world => {
+			console.log(world)
+			initCanvasWorld(world)
+			initCanvasTop(world)
+			initCanvasFront(world)
+			initCanvasSide(world)
+		})
+		.catch(e => {
+			console.warn(e)
+		})
 }
 
 (document.readyState === 'loading') ?
