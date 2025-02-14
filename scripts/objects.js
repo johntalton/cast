@@ -1,4 +1,4 @@
-import { Direction3D, Intersection3D, Matrix3x3, Ray3D, Vector3D } from './cast.js'
+import { Direction3D, Intersection3D, Matrix3x3, Ray3D, Vector3D, Vector3DScalar } from './cast.js'
 
 export class Object3D {
 	#material
@@ -147,6 +147,21 @@ export class Cube extends Object3D {
 		}
 		this.#min = Vector3D.subtract(center, dim)
 		this.#max = Vector3D.add(center, dim)
+	}
+
+	uvAt(point) {
+		const normalPoint = Vector3D.subtract(point, this.#center)
+		const rotation = Matrix3x3.alignment(this.normalAt(point), new Direction3D({ x: 0, y: 0, z: -1 }))
+		const { x: u, y: v } = Matrix3x3.multiply(rotation, normalPoint)
+		return { u, v }
+	}
+
+	normalAt(point) {
+		const p = Vector3D.subtract(point, this.#center)
+		const d = Vector3DScalar.divide(Vector3D.subtract(this.#min, this.#max), 2)
+		const n = Vector3D.trunc(Vector3DScalar.multiply(Vector3D.divide(p, Vector3D.abs(d)), 1.0001))
+
+		return new Direction3D(n)
 	}
 
 	intersections(ray) {

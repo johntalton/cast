@@ -1,7 +1,6 @@
 
 import { Direction3D, Ray3D, Vector2D, Vector3D } from './cast.js'
 import { trace } from './trace.js'
-import { WORLD } from './world.js'
 import { OBJECTS } from './objects.js'
 import { DEFAULT_MAPPER, MAPPERS } from './mapper.js'
 
@@ -108,7 +107,7 @@ function initCanvas(canvas, context, world, camera) {
 		// console.log({ canvasX, canvasY, offsetX, offsetY }, p)
 		const r = new Ray3D(viewportOrigin, Direction3D.from(viewportOrigin, viewportFocus))
 
-		const color = trace(WORLD, r, true)
+		const color = trace(world, r, true)
 		console.log(color)
 	})
 
@@ -164,7 +163,7 @@ function initCanvasSide(world) {
 	const { canvas,  context } = canvasContext('CanvasSide')
 
 	const cameraSide = {
-		origin: { x: -100, y: 0, z: -100 },
+		origin: { x: -200, y: 0, z: -100 },
 		direction: new Direction3D({ x: 1, y: 0, z: 0 }),
 		normal: new Direction3D({ x: 0, y: 1, z: 0 }),
 		fov: 30,
@@ -193,9 +192,10 @@ async function futureWorld(options) {
 	}
 }
 
-
-function onContentLoaded() {
-	futureWorld(WORLD)
+function loadWorld(worldSrc) {
+	fetch(worldSrc, { mode: 'cors' })
+		.then(response => response.json())
+		.then(futureWorld)
 		.then(world => {
 			console.log(world)
 			initCanvasWorld(world)
@@ -206,6 +206,21 @@ function onContentLoaded() {
 		.catch(e => {
 			console.warn(e)
 		})
+}
+
+function onContentLoaded() {
+	const worldSelect = document.getElementById('WorldSelect')
+	if(worldSelect === null) { throw new Error('missing world selector') }
+	if(!(worldSelect instanceof HTMLSelectElement)) { throw new Error('invalid select element') }
+
+	worldSelect?.addEventListener('change', event => {
+		const { target } = event
+		const [ option ] = worldSelect.selectedOptions
+		loadWorld(option.value)
+	})
+
+	const [ option ] = worldSelect.selectedOptions
+	loadWorld(option.value)
 }
 
 (document.readyState === 'loading') ?

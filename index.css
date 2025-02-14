@@ -4,9 +4,22 @@ body {
   margin: 0;
 }
 
-header > h1 {
-  margin: 0;
-  margin-block-end: 1ch;
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-inline: 1ch;
+
+  & h1 {
+    margin: 0;
+    margin-block: .5ch;
+  }
+
+  & select {
+    min-width: 10ch;
+    padding-inline: 2ch;
+    padding-block: 1ch;
+  }
 }
 
 main {

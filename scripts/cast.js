@@ -90,6 +90,22 @@ export class Vector3D {
 		}
 	}
 
+	static abs(v) {
+		return {
+			x: Math.abs(v.x),
+			y: Math.abs(v.y),
+			z: Math.abs(v.z)
+		}
+	}
+
+	static trunc(v) {
+		return {
+			x: Math.trunc(v.x),
+			y: Math.trunc(v.y),
+			z: Math.trunc(v.z)
+		}
+	}
+
 	static dotProduct(v1, v2) {
 		return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z)
 	}
@@ -204,11 +220,7 @@ export class Direction3D {
 	#vector
 
 	static from(p1, p2) {
-		return new Direction3D({
-			x: p2.x - p1.x,
-			y: p2.y - p1.y,
-			z: p2.z - p1.z
-		})
+		return new Direction3D(Vector3D.subtract(p2, p1))
 	}
 
 	constructor(v) {
@@ -221,13 +233,6 @@ export class Direction3D {
 
 	toString() { return `{ x: ${this.x}, y: ${this.y}, z: ${this.z} }` }
 }
-
-
-// export class Point3D {
-// 	x
-// 	y
-// 	z
-// }
 
 export class Transform3D {
 
@@ -263,6 +268,7 @@ export class Intersection3D {
 		this.#entering = entering
 	}
 
+	get ray() { return this.#ray }
 	get distance() { return this.#distance }
 	get object() { return this.#object }
 

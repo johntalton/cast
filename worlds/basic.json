@@ -1,0 +1,49 @@
+{
+	"objects": [
+		{
+			"name": "A-sphere",
+			"type": "sphere",
+			"center": { "x": -100, "y": -20, "z": -80 },
+			"radius": 40,
+			"material": {
+				"color": "red"
+			}
+		},
+    {
+			"name": "B-cube",
+			"type": "cube",
+			"center": { "x": 0, "y": -20, "z": -80 },
+			"width": 80,
+			"height": 80,
+			"depth": 80,
+			"material": {
+				"type": "checker",
+				"width": 27, "height": 27,
+				"color": ["green", "lime"]
+			}
+		},
+    {
+			"name": "C-sphere",
+			"type": "sphere",
+			"center": { "x": 100, "y": -20, "z": -80 },
+			"radius": 40,
+			"material": {
+				"color": "blue"
+			}
+		},
+
+    {
+			"name": "Floor",
+			"type": "plane",
+			"center": { "x": 0, "y": -100, "z": 0 },
+			"normal": { "x": 0, "y": 1, "z": 0 },
+			"material": {
+        "type": "checker",
+        "width": 50, "height": 50,
+				"color": [ "black", "white" ]
+			}
+		}
+
+	],
+	"lights": [{ "x": -200, "y": 250, "z": -280 }]
+}

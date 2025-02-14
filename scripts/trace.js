@@ -1,4 +1,4 @@
-import { Direction3D, Ray3D, Vector3D } from './cast.js'
+import { Direction3D, Ray3D, Vector3D, Vector3DScalar } from './cast.js'
 
 export function trace(world, ray, debug) {
 	const _debug = (...args) => { if(debug) { console.log(...args) } }
@@ -19,9 +19,9 @@ export function trace(world, ray, debug) {
 	if(allIntersections.length > 0) {
 		const [ intersection ] = allIntersections
 
-		if(intersection.distance > 5000) {
-			return 'crimson'
-		}
+		// if(intersection.distance > 5000) {
+		// 	return 'crimson'
+		// }
 
 		const [ firstLight ] = world.lights
 
@@ -53,14 +53,53 @@ export function trace(world, ray, debug) {
 		.reduce((acc, hit) => acc || hit, false)
 
 
-		// intersection.normal
-		// intersection.color
+		const ambient = 0.5
+		const light_intensity = 20
+		const diffuse = 1
+
+		const gloss = 5
+		const specular = 1
+		const lightColor = 'lemonchiffon'
+
+		const N = intersection.normal
+		const L = lightDirection
+		const V = Vector3D.normalized(Vector3D.negate(intersection.ray.direction))
+		const I = Vector3D.negate(L)
+
+		if(debug) { console.log(`normal ${N}`, N) }
+		// if(debug) { console.log(Vector3D.dotProduct(N, V)) }
+		// const facingRatio = Math.max(0, Vector3D.dotProduct(N, V))
+		// if(debug) { console.log({ N, L, V, I, facingRatio} ) }
+		// const color = `color(from ${intersection.color} srgb calc(r * ${facingRatio}) calc(g * ${facingRatio}) calc(b * ${facingRatio}))`
+
+
+		const albedo = .18
+		const x = (albedo / Math.PI) * light_intensity * Math.max(0, Vector3D.dotProduct(N, L))
+		if(debug) { console.log({ x } ) }
+		const color = `color(from ${intersection.color} srgb calc(r * ${x}) calc(g * ${x}) calc(b * ${x}))`
 
 
 
+		// lambertian Ld = Kd (I/r2) max(0, n.l)
 
-		return hasShadow ? `color-mix(in lab, black 40%, ${intersection.color})` : intersection.color
-		// return intersection.object.material.color
+		// const div = 2 * Vector3D.dotProduct(N, L)
+		// const R = Vector3D.normalized(Vector3D.add(N, Vector3DScalar.divide(I, div)))
+
+		// const d = diffuse * (Vector3D.dotProduct(N, L) * light_intensity)
+
+    // const angle = Vector3D.dotProduct(V, R)
+		// const s = (angle > 0.0) ? (specular * Math.pow(angle, gloss)) : 0
+
+		// if(debug) { console.log({ N, L, V, I, angle} ) }
+
+		// const calcR = `calc((${ambient} * r) + (${d} * r))`
+		// const calcG = `calc((${ambient} * g) + (${d} * g))`
+		// const calcB = `calc(((${ambient} * b) + ${d} * b))`
+		// const _color = `color(from ${intersection.color} srgb ${calcR} ${calcG} ${calcB})`
+		// const _light = `color(from ${lightColor} srgb calc(${s} * r) calc(${s} * g) calc(${s} * b))`
+		// const color = `color-mix(in lab, ${_color}, ${_light})`
+
+		return hasShadow ? `color-mix(in lab, black 20%, ${color})` : color
 	}
 
 	return 'lightblue'
