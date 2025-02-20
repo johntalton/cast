@@ -1,7 +1,44 @@
 {
+	"views": [
+		{
+			"name": "default",
+			"origin": { "x": -300, "y": -20, "z": -300 },
+			"_direction": { "x": 1, "y": 0, "z": 1 },
+			"_normal": { "x": 0, "y": 1, "z": 0 },
+			"lookAt": { "x": 0, "y": -20, "z": -80 },
+			"fov": 30,
+			"focalDistance": 1,
+			"viewportWidth": 200, "viewportHeight": 150
+		},
+		{
+			"name": "top",
+			"origin": { "x": 0, "y": 100, "z": -100 },
+			"lookAt": { "x": 0, "y": -20, "z": -80 },
+			"fov": 30,
+			"focalDistance": 1,
+			"viewportWidth": 200, "viewportHeight": 150
+		},
+		{
+			"name": "side",
+			"origin": { "x": -200, "y": -20, "z": -80 },
+			"lookAt": { "x": 0, "y": -20, "z": -80 },
+			"fov": 30,
+			"focalDistance": 1,
+			"viewportWidth": 200, "viewportHeight": 150
+		},
+		{
+			"name": "front",
+			"origin": { "x": 0, "y": -20, "z": -200 },
+			"lookAt": { "x": 0, "y": -20, "z": -80 },
+			"fov": 30,
+			"focalDistance": 1,
+			"viewportWidth": 200, "viewportHeight": 150
+		}
+
+	],
 	"objects": [
 		{
-			"name": "A-sphere",
+			"name": "A",
 			"type": "sphere",
 			"center": { "x": -100, "y": -20, "z": -80 },
 			"radius": 40,
@@ -10,20 +47,18 @@
 			}
 		},
     {
-			"name": "B-cube",
+			"name": "B",
 			"type": "cube",
 			"center": { "x": 0, "y": -20, "z": -80 },
 			"width": 80,
 			"height": 80,
 			"depth": 80,
 			"material": {
-				"type": "checker",
-				"width": 27, "height": 27,
-				"color": ["green", "lime"]
+				"color": "green"
 			}
 		},
     {
-			"name": "C-sphere",
+			"name": "C",
 			"type": "sphere",
 			"center": { "x": 100, "y": -20, "z": -80 },
 			"radius": 40,
@@ -39,11 +74,11 @@
 			"normal": { "x": 0, "y": 1, "z": 0 },
 			"material": {
         "type": "checker",
-        "width": 50, "height": 50,
+        "width": 75, "height": 75,
 				"color": [ "black", "white" ]
 			}
 		}
 
 	],
-	"lights": [{ "x": -200, "y": 250, "z": -280 }]
+	"lights": [{ "x": 200, "y": 150, "z": -280 }]
 }

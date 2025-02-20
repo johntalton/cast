@@ -1,5 +1,5 @@
 
-import { Direction3D, Ray3D, Vector2D, Vector3D } from './cast.js'
+import { Direction3D, Matrix3x3, Ray3D, Vector2D, Vector3D } from './cast.js'
 import { trace } from './trace.js'
 import { OBJECTS } from './objects.js'
 import { DEFAULT_MAPPER, MAPPERS } from './mapper.js'
@@ -71,20 +71,6 @@ function canvasToCameraViewport(camera, canvasX, canvasY, canvasWidth, canvasHei
 	return { viewportOrigin, viewportFocus }
 }
 
-function canvasContext(name) {
-	const canvas = document.getElementById(name)
-	if(canvas === null) { throw new Error('missing canvas') }
-	if(!(canvas instanceof HTMLCanvasElement)) { throw new Error('canvas not a Canvas') }
-
-	const context = canvas.getContext('2d', {
-		alpha: true,
-		colorSpace: 'display-p3'
-	})
-
-	if(context === null) { throw new Error('failed to create canvas context') }
-	return { canvas, context }
-}
-
 function initCanvas(canvas, context, world, camera) {
 	const { port1, port2 } = new MessageChannel()
 
@@ -114,81 +100,60 @@ function initCanvas(canvas, context, world, camera) {
 	cast(world, canvas.width, canvas.height, camera, port1)
 }
 
-function initCanvasWorld(world) {
-	const { canvas,  context } = canvasContext('Canvas')
 
-	const cameraWorld = {
-		origin: { x: -200, y: 0, z: -350 },
-		direction: new Direction3D({ x: 1, y: 0, z: 1 }),
-		normal: new Direction3D({ x: 0, y: 1, z: 0 }),
-		fov: 30,
-		focalDistance: 1,
-		viewportWidth: 200, viewportHeight: 150
-	}
+async function futureObject(options) {
+	const maker = OBJECTS[(options.type ?? 'sphere').toLowerCase()]
+	const mapperType = options.material?.type ?? DEFAULT_MAPPER
+	const mapperMaker = MAPPERS[mapperType.toLowerCase()]
 
-	initCanvas(canvas, context, world, cameraWorld)
+	if(maker === undefined) { throw new Error(`unknown maker`) }
+	if(mapperMaker === undefined) { throw new Error(`unknown mapper ${mapperType}`) }
+
+	const objects = options.objects ? await Promise.all(options.objects?.map(futureObject)) : undefined
+
+	return new maker({
+		...options,
+		material: {
+			...options.material,
+			mapper: await Promise.try(mapperMaker, options.material)
+		},
+		objects
+	})
 }
 
-function initCanvasTop(world) {
-	const { canvas,  context } = canvasContext('CanvasTop')
+function lookAt(view) {
+	const { origin, lookAt: at, normal: overrideNormal, direction: overrideDirection } = view
 
-	const cameraTop = {
-		origin: { x: 0, y: 100, z: -100 },
-		direction: new Direction3D({ x: 0, y: -1, z: 0 }),
-		normal: new Direction3D({ x: 0, y: 0, z: 1 }),
-		fov: 30,
-		focalDistance: 1,
-		viewportWidth: 200, viewportHeight: 150
+	if(overrideNormal !== undefined && overrideDirection !== undefined) {
+		return {
+			direction: new Direction3D(overrideDirection),
+			normal: new Direction3D(overrideNormal)
+		}
 	}
 
-	initCanvas(canvas, context, world, cameraTop)
-}
+	const initialDirection = new Direction3D({ x: 0, y: 0, z: 1 })
+	const initialNormal = new Direction3D({ x: 0, y: 1, z: 0 })
 
-function initCanvasFront(world) {
-	const { canvas,  context } = canvasContext('CanvasFront')
+	const direction = Direction3D.from(origin, at)
 
-	const cameraFront = {
-		origin: { x: 0, y: 0, z: -200 },
-		direction: new Direction3D({ x: 0, y: 0, z: 1 }),
-		normal: new Direction3D({ x: 0, y: 1, z: 0 }),
-		fov: 30,
-		focalDistance: 1,
-		viewportWidth: 200, viewportHeight: 150
-	}
+	const rotation = Matrix3x3.alignment(initialDirection, direction)
+	const normal = Vector3D.normalized(Matrix3x3.multiply(rotation, initialNormal))
 
-	initCanvas(canvas, context, world, cameraFront)
-}
-
-function initCanvasSide(world) {
-	const { canvas,  context } = canvasContext('CanvasSide')
-
-	const cameraSide = {
-		origin: { x: -200, y: 0, z: -100 },
-		direction: new Direction3D({ x: 1, y: 0, z: 0 }),
-		normal: new Direction3D({ x: 0, y: 1, z: 0 }),
-		fov: 30,
-		focalDistance: 1,
-		viewportWidth: 200, viewportHeight: 150
-	}
-
-	initCanvas(canvas, context, world, cameraSide)
+	return { direction, normal }
 }
 
 async function futureWorld(options) {
 	return {
+		views: options.views.map(view => {
+			const { direction, normal } = lookAt(view)
+			return {
+				...view,
+				direction,
+				normal
+			}
+		}),
 		lights: options.lights,
-		objects: await Promise.all(options.objects.map(async objOptions => {
-			const maker = OBJECTS[objOptions.type ?? 'sphere']
-			const mapperType = objOptions.material?.type ?? DEFAULT_MAPPER
-			const mapperMaker = MAPPERS[mapperType]
-			return new maker({
-				...objOptions,
-				material: {
-					...objOptions.material,
-					mapper: await Promise.try(mapperMaker, objOptions.material)
-				}
-			})
-		}))
+		objects: await Promise.all(options.objects.map(futureObject))
 	}
 }
 
@@ -197,11 +162,38 @@ function loadWorld(worldSrc) {
 		.then(response => response.json())
 		.then(futureWorld)
 		.then(world => {
-			console.log(world)
-			initCanvasWorld(world)
-			initCanvasTop(world)
-			initCanvasFront(world)
-			initCanvasSide(world)
+			const mainElem = document.querySelector('main[data-multi]')
+
+			const existing = mainElem.querySelectorAll('main > section')
+			existing.forEach(s => s.remove())
+
+			const viewTemplate = document.getElementById('ViewTemplate')
+			if((viewTemplate === null) || !(viewTemplate instanceof HTMLTemplateElement)) { throw new Error('invalid template for view section') }
+
+			world.views?.forEach(view => {
+				const clone = viewTemplate.content.cloneNode(true)
+				const sectionElem = clone.querySelector('section')
+				const output = sectionElem.querySelector('output')
+				const canvas = sectionElem.querySelector('canvas')
+
+				if(canvas === null) { throw new Error('missing canvas') }
+				if(!(canvas instanceof HTMLCanvasElement)) { throw new Error('canvas not a Canvas') }
+
+				const context = canvas.getContext('2d', {
+					alpha: true,
+					colorSpace: 'display-p3'
+				})
+
+				if(context === null) { throw new Error('failed to create canvas context') }
+
+				output.value = view.name ?? ''
+
+				mainElem?.append(sectionElem)
+
+				initCanvas(canvas, context, world, view)
+
+				return clone
+			})
 		})
 		.catch(e => {
 			console.warn(e)
@@ -209,6 +201,27 @@ function loadWorld(worldSrc) {
 }
 
 function onContentLoaded() {
+	const reloadButton = document.querySelector('button[command="--reload"]')
+
+	if(typeof CommandEvent !== 'undefined') {
+		reloadButton?.addEventListener('command', event => {
+			const { command } = event
+			if(command === '--reload') {
+				reload()
+			}
+
+			console.log('command?', command)
+		})
+	}
+	else {
+		reloadButton?.addEventListener('click', event => {
+			console.log('reload', event)
+			reload()
+		})
+	}
+
+
+
 	const worldSelect = document.getElementById('WorldSelect')
 	if(worldSelect === null) { throw new Error('missing world selector') }
 	if(!(worldSelect instanceof HTMLSelectElement)) { throw new Error('invalid select element') }
@@ -221,6 +234,11 @@ function onContentLoaded() {
 
 	const [ option ] = worldSelect.selectedOptions
 	loadWorld(option.value)
+
+	const reload = () => {
+		const [ option ] = worldSelect.selectedOptions
+		loadWorld(option.value)
+	}
 }
 
 (document.readyState === 'loading') ?

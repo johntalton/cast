@@ -1,5 +1,17 @@
+/**
+ * @typedef VectorLike
+ * @property {number} x
+ * @property {number} y
+ * @property {number} z
+ */
+
 
 export class Vector3DScalar {
+	/**
+	 * @param {VectorLike} v
+	 * @param {number} divisor
+	 * @returns {VectorLike}
+	 */
 	static divide(v, divisor) {
 		return {
 			x: v.x / divisor,
@@ -8,6 +20,11 @@ export class Vector3DScalar {
 		}
 	}
 
+	/**
+	 * @param {VectorLike} v
+	 * @param {number} multiplier
+	 * @returns {VectorLike}
+	 */
 	static multiply(v, multiplier) {
 		return {
 			x: v.x * multiplier,
@@ -16,16 +33,29 @@ export class Vector3DScalar {
 		}
 	}
 
+	/**
+	 * @param {VectorLike} v
+	 * @returns {number}
+	 */
 	static magnitude(v) {
 		return Math.sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z))
 	}
 
+	/**
+	 * @param {VectorLike} v
+	 * @returns {number}
+	 */
 	static magnitudeSquared(v) {
 		return (v.x * v.x) + (v.y * v.y) + (v.z * v.z)
 	}
 }
 
 export class Vector3D {
+	/**
+	 * @param {VectorLike} v1
+	 * @param {VectorLike} v2
+	 * @returns {VectorLike}
+	 */
 	static add(v1, v2) {
 		return {
 			x: v1.x + v2.x,
@@ -34,6 +64,11 @@ export class Vector3D {
 		}
 	}
 
+	/**
+	 * @param {VectorLike} v1
+	 * @param {VectorLike} v2
+	 * @returns {VectorLike}
+	 */
 	static subtract(v1, v2) {
 		return {
 			x: v1.x - v2.x,
@@ -42,6 +77,11 @@ export class Vector3D {
 		}
 	}
 
+	/**
+	 * @param {VectorLike} v1
+	 * @param {VectorLike} v2
+	 * @returns {VectorLike}
+	 */
 	static divide(v1, v2) {
 		return {
 			x: v1.x / v2.x,
@@ -50,6 +90,11 @@ export class Vector3D {
 		}
 	}
 
+	/**
+	 * @param {VectorLike} v1
+	 * @param {VectorLike} v2
+	 * @returns {VectorLike}
+	 */
 	static multiply(v1, v2) {
 		return {
 			x: v1.x * v2.x,
@@ -58,6 +103,10 @@ export class Vector3D {
 		}
 	}
 
+	/**
+	 * @param {VectorLike} v
+	 * @returns {VectorLike}
+	 */
 	static negate(v) {
 		return {
 			x: -v.x,
@@ -66,6 +115,10 @@ export class Vector3D {
 		}
 	}
 
+	/**
+	 * @param {VectorLike} v
+	 * @returns {VectorLike}
+	 */
 	static invert(v) {
 		return {
 			x: 1 / v.x,
@@ -74,6 +127,11 @@ export class Vector3D {
 		}
 	}
 
+	/**
+	 * @param {VectorLike} v1
+	 * @param {VectorLike} v2
+	 * @returns {VectorLike}
+	 */
 	static min(v1, v2) {
 		return {
 			x: Math.min(v1.x, v2.x),
@@ -82,6 +140,11 @@ export class Vector3D {
 		}
 	}
 
+	/**
+	 * @param {VectorLike} v1
+	 * @param {VectorLike} v2
+	 * @returns {VectorLike}
+	 */
 	static max(v1, v2) {
 		return {
 			x: Math.max(v1.x, v2.x),
@@ -90,6 +153,10 @@ export class Vector3D {
 		}
 	}
 
+	/**
+	 * @param {VectorLike} v
+	 * @returns {VectorLike}
+	 */
 	static abs(v) {
 		return {
 			x: Math.abs(v.x),
@@ -98,6 +165,10 @@ export class Vector3D {
 		}
 	}
 
+	/**
+	 * @param {VectorLike} v
+	 * @returns {VectorLike}
+	 */
 	static trunc(v) {
 		return {
 			x: Math.trunc(v.x),
@@ -106,10 +177,20 @@ export class Vector3D {
 		}
 	}
 
+	/**
+	 * @param {VectorLike} v1
+	 * @param {VectorLike} v2
+	 * @returns {number}
+	 */
 	static dotProduct(v1, v2) {
 		return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z)
 	}
 
+	/**
+	 * @param {VectorLike} v1
+	 * @param {VectorLike} v2
+	 * @returns {VectorLike}
+	 */
 	static crossProduct(v1, v2) {
 		return {
 			x: v1.y * v2.z - v1.z * v2.y,
@@ -118,12 +199,21 @@ export class Vector3D {
 		}
 	}
 
+	/**
+	 * @param {VectorLike} v
+	 * @returns {VectorLike}
+	 */
 	static normalized(v) {
 		const m = Vector3DScalar.magnitude(v)
 		if(m === 0) { return { ...v } }
 		return Vector3DScalar.divide(v, m)
 	}
 
+	/**
+	 * @param {VectorLike} v1
+	 * @param {VectorLike} v2
+	 * @returns {number}
+	 */
 	static distance(v1, v2) {
     return Vector3DScalar.magnitude(Vector3D.subtract(v2, v1))
 	}
@@ -260,6 +350,7 @@ export class Intersection3D {
 	#distance
 	#object
 	#entering
+	#invert = false
 
 	constructor(ray, distance, object, entering) {
 		this.#ray = ray
@@ -268,9 +359,25 @@ export class Intersection3D {
 		this.#entering = entering
 	}
 
+	static invert(intersection) {
+		const i = new Intersection3D(
+			intersection.#ray,
+			intersection.#distance,
+			intersection.#object,
+			intersection.#entering
+		)
+		i.#invert = true
+
+		return i
+	}
+
 	get ray() { return this.#ray }
 	get distance() { return this.#distance }
 	get object() { return this.#object }
+	get entering() {
+		if(this.#invert) { return !this.#entering }
+		return this.#entering
+	}
 
 	get at() {
 		return this.#ray.at(this.distance)
@@ -281,8 +388,11 @@ export class Intersection3D {
 	}
 
 	get normal() {
+		if(this.#invert) { return Vector3D.negate(this.#object.normalAt(this.at)) }
 		return this.#object.normalAt(this.at)
 	}
+
+	// toString() {}
 }
 
 export class Vector2D {

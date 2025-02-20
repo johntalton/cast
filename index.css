@@ -15,11 +15,26 @@ header {
     margin-block: .5ch;
   }
 
-  & select {
-    min-width: 10ch;
-    padding-inline: 2ch;
-    padding-block: 1ch;
+  & menu {
+    display: flex;
+    gap: 1ch;
+    margin: 0;
+
+    & select {
+      min-width: 10ch;
+      padding-inline: 2ch;
+      padding-block: 1ch;
+    }
+
+    & button[command="--reload"] {
+      font-variant-emoji: emoji;
+      font-size: 2em;
+      padding: 0;
+      border: 0;
+      background: inherit;
+    }
   }
+
 }
 
 main {
@@ -27,19 +42,29 @@ main {
   justify-content: center;
 }
 
+
 main[data-multi] {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  justify-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  & > * {
+    flex: 50%;
+  }
 }
 
+
 section {
+  position: relative;
   display: flex;
   width: 100%;
 
-  & >span {
+  & > output {
     position: absolute;
+    font-size: 1.5em;
+    top: 0.5em;
+    left: 1ch;
+    text-shadow: 1px 1px 0px white;
   }
 
   & > canvas {

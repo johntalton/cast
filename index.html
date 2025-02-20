@@ -17,28 +17,25 @@
 	<body>
 		<header>
       <h1>Cast</h1>
-			<select id="WorldSelect">
-				<option value="worlds/world.json">World</option>
-				<option value="worlds/basic.json" selected>Basic</option>
-			</select>
+
+			<menu>
+				<button id="Reload" commandfor="Reload" command="--reload">🔄</button>
+				<select id="WorldSelect">
+					<option value="worlds/world.json">World</option>
+					<option value="worlds/basic.json">Basic</option>
+					<option value="worlds/csg.json" selected>CSG</option>
+				</select>
+				</menu>
 		</header>
 		<main data-multi>
-			<section>
-				<span>World</span>
-				<canvas id="Canvas" width="400" height="300"></canvas>
-			</section>
-			<section>
-				<span>Top</span>
-				<canvas id="CanvasTop" width="400" height="300"></canvas>
-			</section>
-			<section>
-				<span>Side</span>
-				<canvas id="CanvasSide" width="400" height="300"></canvas>
-			</section>
-			<section>
-				<span>Front</span>
-				<canvas id="CanvasFront" width="400" height="300"></canvas>
-			</section>
+			<template id="ViewTemplate">
+				<section>
+					<output></output>
+					<canvas width="400" height="300"></canvas>
+				</section>
+			</template>
+
+			<!-- dynamic content -->
 		</main>
 	</body>
 </html>

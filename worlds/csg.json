@@ -1,0 +1,54 @@
+{
+	"views": [
+		{
+			"name": "default",
+			"origin": { "x": 2, "y": 2, "z": -4 },
+			"lookAt": { "x": 0, "y": 0, "z": 0 },
+			"fov": 30,
+			"focalDistance": 1,
+			"viewportWidth": 4, "viewportHeight": 3
+		}
+	],
+	"objects": [
+		{
+			"name": "A",
+			"type": "csg",
+			"operation": "difference",
+			"center": { "x": 0, "y": 0, "z": 0 },
+			"objects": [
+				{
+					"type": "cube",
+					"center": { "x": 0, "y": 0, "z": 0 },
+					"width": 2,
+					"height": 2,
+					"depth": 2
+				},
+				{
+					"type": "csg",
+					"operation": "union",
+
+					"objects": [
+						{
+							"type": "sphere",
+							"center": { "x": 0, "y": 0, "z": -0.85 },
+							"radius": 1
+						},
+						{
+							"type": "sphere",
+							"center": { "x": 0, "y": 0, "z": 0.85 },
+							"radius": 1
+						}
+					]
+				}
+			],
+			"material": {
+				"type": "checker",
+				"width": 0.5, "height": 0.5,
+				"color": ["blue", "white"]
+			}
+		}
+	],
+	"lights": [
+		{ "x": 5, "y": 15, "z":-15 }
+	]
+}
