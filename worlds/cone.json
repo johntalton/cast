@@ -1,0 +1,63 @@
+{
+	"views": [
+		{
+			"name": "side",
+			"origin": { "x": -100, "y": 50, "z": 0 },
+			"lookAt": { "x": 0, "y": 0, "z": 0 },
+      "direction": { "x": 1, "y": -0.5, "z": 0 },
+      "normal": { "x": 1, "y": 0.5, "z": 0 },
+			"fov": 30,
+			"focalDistance": 1,
+			"viewportWidth": 20, "viewportHeight": 15
+		},
+		{
+			"name": "front",
+			"origin": { "x": 0, "y": 50, "z": -100 },
+			"lookAt": { "x": 0, "y": 0, "z": 0 },
+			"fov": 30,
+			"focalDistance": 1,
+			"viewportWidth": 20, "viewportHeight": 15
+		}
+
+	],
+	"objects": [
+    {
+      "type": "sphere",
+      "center": { "x": 0, "y": 20, "z": 0 },
+      "radius": 1,
+      "material": {
+        "color": "red"
+      }
+    },
+		{
+      "name": "A",
+      "type": "cone",
+      "center": { "x": 0, "y": 20, "z": 0 },
+      "orientation": { "x": 0, "y": -1, "z": 0 },
+      "angle": 1.5,
+      "material": {
+        "color": [ "blue", "white" ]
+      }
+    },
+
+    {
+			"name": "Floor",
+			"type": "plane",
+			"center": { "x": 0, "y": 0, "z": 0 },
+			"normal": { "x": 0, "y": 1, "z": 0 },
+			"material": {
+        "type": "checker",
+        "width": 10, "height": 10,
+				"color": [ "grey", "white" ]
+			}
+		}
+
+	],
+	"lights": [
+    {
+      "type": "point",
+      "center": { "x": 70, "y": 70, "z": -50 },
+      "color": "lemonchiffon"
+    }
+  ]
+}

@@ -158,7 +158,7 @@ async function futureWorld(options) {
 }
 
 function loadWorld(worldSrc) {
-	fetch(worldSrc, { mode: 'cors' })
+	return fetch(worldSrc, { mode: 'cors' })
 		.then(response => response.json())
 		.then(futureWorld)
 		.then(world => {
@@ -220,25 +220,20 @@ function onContentLoaded() {
 		})
 	}
 
-
-
 	const worldSelect = document.getElementById('WorldSelect')
 	if(worldSelect === null) { throw new Error('missing world selector') }
 	if(!(worldSelect instanceof HTMLSelectElement)) { throw new Error('invalid select element') }
 
 	worldSelect?.addEventListener('change', event => {
-		const { target } = event
-		const [ option ] = worldSelect.selectedOptions
-		loadWorld(option.value)
+		reload()
 	})
-
-	const [ option ] = worldSelect.selectedOptions
-	loadWorld(option.value)
 
 	const reload = () => {
 		const [ option ] = worldSelect.selectedOptions
-		loadWorld(option.value)
+		return loadWorld(option.value)
 	}
+
+	reload()
 }
 
 (document.readyState === 'loading') ?

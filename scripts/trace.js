@@ -1,5 +1,7 @@
 import { Direction3D, Ray3D, Vector3D, Vector3DScalar } from './cast.js'
 
+const STEP_OFF_NORMAL_MULTIPLYER = 0.0125
+
 export function trace(world, ray, debug) {
 
 
@@ -24,13 +26,13 @@ export function trace(world, ray, debug) {
 
 		const [ firstLight ] = world.lights
 
-		const lightDirection = Direction3D.from(intersection.at, firstLight)
+		const lightDirection = Direction3D.from(intersection.at, firstLight.center)
 		if(debug) { console.log({ intersection, lightDirection }) }
 		const actualIntersectionPoint = intersection.at
-		const stepOffIntersectionPoint = Vector3D.add(actualIntersectionPoint, intersection.normal)
+		const stepOffIntersectionPoint = Vector3D.add(actualIntersectionPoint, Vector3DScalar.multiply(intersection.normal, STEP_OFF_NORMAL_MULTIPLYER))
 		const shadowRay = new Ray3D(stepOffIntersectionPoint, lightDirection)
 
-		const distanceToLight = Vector3D.distance(intersection.at, firstLight)
+		const distanceToLight = Vector3D.distance(intersection.at, firstLight.center)
 
 		const hasShadow = world.objects.map(shadowObj => {
 			// if(intersection.object === shadowObj) { return false }
@@ -58,7 +60,7 @@ export function trace(world, ray, debug) {
 
 		const gloss = 100
 		const specular = 5
-		const lightColor = 'lemonchiffon'
+		const lightColor = firstLight.color
 
 		const N = intersection.normal
 		const L = lightDirection
@@ -72,7 +74,7 @@ export function trace(world, ray, debug) {
 		// if(debug) { console.log({ N, L, V, I, facingRatio} ) }
 		// const color = `color(from ${intersection.color} srgb calc(r * ${facingRatio}) calc(g * ${facingRatio}) calc(b * ${facingRatio}))`
 		// return hasShadow ? 'black' : color
-		// }
+		//}
 
 		// {
 		// const albedo = .18

@@ -42,12 +42,12 @@ export class QuadraticObject3D extends Object3D {
 		super(options)
 	}
 
-	quadratic(ray) {
+	quadratic(ray, debug) {
 		return { a: 0, b: 0, c: 0 }
 	}
 
-	intersections(ray) {
-		const { a, b, c } = this.quadratic(ray)
+	intersections(ray, debug) {
+		const { a, b, c } = this.quadratic(ray, debug)
 
 		// quadratic
 		const discriminate = (b * b) - (4.0 * a * c)
@@ -58,14 +58,17 @@ export class QuadraticObject3D extends Object3D {
 			return [new Intersection3D(ray, t, this, false)]
 		}
 
-		const t1 = (-b + Math.sqrt(discriminate)) / (2 * a)
-		const t2 = (-b - Math.sqrt(discriminate)) / (2 * a)
+		const sqrtDiscriminate = Math.sqrt(discriminate)
+
+		const t1 = (-b - sqrtDiscriminate) / (2.0 * a)
+		const t2 = (-b + sqrtDiscriminate) / (2.0 * a)
 
 		// console.log(t1, t2)
+		const enterFirst = t1 < t2
 
 		return [
-			new Intersection3D(ray, t1, this, false),
-			new Intersection3D(ray, t2, this, true)
+			new Intersection3D(ray, t1, this, enterFirst),
+			new Intersection3D(ray, t2, this, !enterFirst)
 		]
 	}
 }
@@ -101,7 +104,7 @@ export class Plane extends Object3D {
 		const diff = Vector3D.subtract(this.#center, ray.origin)
 		const t = Vector3D.dotProduct(diff, this.#normal) / denominator
 
-		return [ new Intersection3D(ray, t, this, false) ]
+		return [ new Intersection3D(ray, t, this, true) ]
 	}
 }
 
@@ -134,7 +137,7 @@ export class Sphere extends QuadraticObject3D {
 		// const u = (Math.atan2(d.y, d.x) + Math.PI) / 2 * Math.PI
 		// const v = (Math.asin(d.z) + Math.PI / 2) / Math.PI
 
-		return { u, v, normal: true }
+		return { u, v, normalU: true, normalV: true }
 	}
 
 	quadratic(ray) {
@@ -251,7 +254,9 @@ export class Cylinder extends QuadraticObject3D {
 		const angle = Math.acos(Vector3D.dotProduct(p, { x: 0, y: -1, z: 0}))
 		return {
 			u: Math.cos(angle + offset) * 2 * this.#radius,
-			v: point.z
+			v: point.z,
+			normalU: true,
+			normalV: false
 		}
 	}
 
@@ -279,6 +284,70 @@ export class Cylinder extends QuadraticObject3D {
 
 
 		return { a, b, c }
+	}
+}
+
+export class Cone extends QuadraticObject3D {
+	static DEFAULT_ANGLE = Math.PI / 4
+
+	#center
+	#orientation
+	#angle
+
+	constructor(options) {
+		super(options)
+
+		this.#center = options.center
+		this.#orientation = new Direction3D(options.orientation ?? { x: 0, y: 1, z: 0 })
+		this.#angle = options.angle ?? Cone.DEFAULT_ANGLE
+	}
+
+	uvAt(point) {
+		return super.uvAt(point)
+	}
+
+	normalAt(point) {
+		const d = Vector3D.distance(point, this.#center)
+		const halfAngle = this.#angle / 2
+
+		const h = d / Math.cos(halfAngle)
+		const r = new Ray3D(this.#center, this.#orientation)
+		const from = r.at(h)
+
+		return Direction3D.from(from, point)
+	}
+
+	quadratic(ray, debug) {
+		// https://lousodrome.net/blog/light/2017/01/03/intersection-of-a-ray-and-a-cone/
+		const DdotV = Vector3D.dotProduct(ray.direction, this.#orientation)
+		const halfAngle = this.#angle / 2.0
+		const cosSqrAngle = Math.pow(Math.cos(halfAngle), 2)
+		const CO = Vector3D.subtract(ray.origin, this.#center)
+		const COdotV = Vector3D.dotProduct(CO, this.#orientation)
+		const COdotCO = Vector3D.dotProduct(CO, CO)
+
+		const a = Math.pow(DdotV, 2) - cosSqrAngle
+		const b = 2 * (DdotV * COdotV - Vector3D.dotProduct(ray.direction, CO) * cosSqrAngle)
+		const c = Math.pow(COdotV, 2) - COdotCO * cosSqrAngle
+
+		// if(debug) { console.log({ a, b, c }) }
+
+		return { a, b, c }
+	}
+
+	intersections(ray, debug) {
+		return super.intersections(ray, debug)
+			.filter(intersection => {
+				const pc = Direction3D.from(this.#center, intersection.at)
+				const angle = Vector3D.dotProduct(this.#orientation, pc)
+
+				if(debug) { console.log({
+					d: intersection.distance,
+					at: intersection.at,
+					pc,
+					angle }) }
+				return angle > 0
+			})
 	}
 }
 
@@ -379,5 +448,6 @@ export const OBJECTS = {
 	'sphere': Sphere,
 	'cube': Cube,
 	'cylinder': Cylinder,
+	'cone': Cone,
 	'csg': CSG
 }

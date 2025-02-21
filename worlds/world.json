@@ -100,5 +100,11 @@
 			"material": { "type": "checker", "color": "color-mix(in lab, white 70%, black)" }
 		}
 	],
-	"lights": [{ "x": -300, "y": 300, "z": -500 }]
+	"lights": [
+    {
+      "type": "point",
+      "center": { "x": -300, "y": 300, "z": -500 },
+      "color": "pink"
+    }
+  ]
 }

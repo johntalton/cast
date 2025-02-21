@@ -54,7 +54,11 @@
 			"height": 80,
 			"depth": 80,
 			"material": {
-				"color": "green"
+				"type": "checker",
+				"width": 27,
+				"depth": 27,
+				"height": 27,
+				"color": [ "green", "lime" ]
 			}
 		},
     {
@@ -63,6 +67,7 @@
 			"center": { "x": 100, "y": -20, "z": -80 },
 			"radius": 40,
 			"material": {
+				"type": "checker",
 				"color": "blue"
 			}
 		},
@@ -80,5 +85,11 @@
 		}
 
 	],
-	"lights": [{ "x": 200, "y": 150, "z": -280 }]
+	"lights": [
+    {
+      "type": "point",
+      "center": { "x": 200, "y": 150, "z": -200 },
+      "color": "lemonchiffon"
+    }
+  ]
 }
