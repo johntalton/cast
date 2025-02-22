@@ -1,26 +1,12 @@
-import { Direction3D, Ray3D, Vector2D, Vector3D, Vector3DScalar } from './cast.js'
-import { trace } from './trace.js'
+import { Direction3D, Ray3D, Vector2D, Vector3D, Vector3DScalar } from './lib/maths.js'
+import { trace } from './lib/trace.js'
 
 function canvasToCameraViewport(camera, canvasX, canvasY, canvasWidth, canvasHeight, debug) {
-	const _debug = (...args) => { if(debug) { console.log(...args) } }
 
 	const viewportWidthDiv2 = camera.viewportWidth / 2
 	const viewportHeightDiv2 = camera.viewportHeight / 2
 	const viewportOffsetX = Vector2D.mapRange(canvasX, 0, canvasWidth, -viewportWidthDiv2, viewportWidthDiv2)
 	const viewportOffsetY = Vector2D.mapRange(canvasY, 0, canvasHeight, viewportHeightDiv2, -viewportHeightDiv2)
-
-	// const horizonRight = Vector3D.crossProduct(camera.direction, camera.normal)
-
-	// const toViewportCenter = new Ray3D(camera.origin, camera.direction)
-	// const viewportCenter = toViewportCenter.at(camera.viewportDistance)
-
-	// const xR = new Ray3D(viewportCenter, horizonRight)
-	// const viewportX = xR.at(viewportOffsetX)
-	// const yR = new Ray3D(viewportX, camera.normal)
-	// const viewportOrigin = yR.at(viewportOffsetY)
-
-	// const focusR = new Ray3D(camera.origin, Direction3D.from(camera.origin, viewportOrigin))
-	// const viewportFocus = focusR.at(camera.focalDistance)
 
 	const fovRadian = (camera.fov / 2) * (Math.PI / 180)
 	const eyeDistance = (1 / Math.tan(fovRadian)) * viewportWidthDiv2
@@ -37,24 +23,34 @@ function canvasToCameraViewport(camera, canvasX, canvasY, canvasWidth, canvasHei
 	const focusR = new Ray3D(viewportOrigin, Direction3D.from(eye, viewportOrigin))
 	const viewportFocus = focusR.at(camera.focalDistance)
 
-	_debug({
-		canvasX, canvasY,
-		viewportOffsetX, viewportOffsetY,
-		// fromEyeOrigin: fromEye.origin,
-		// fromEyeDirection: `${fromEye.direction}`,
-		// fovRadian,
-		// eyeDistance,
-		// eye,
-		// crossAxis,
-		// viewportX,
-		viewportOrigin,
-		viewportFocus
-	})
+	if(debug) {
+		console.log({
+			canvasX, canvasY,
+			viewportOffsetX, viewportOffsetY,
+			// fromEyeOrigin: fromEye.origin,
+			// fromEyeDirection: `${fromEye.direction}`,
+			// fovRadian,
+			// eyeDistance,
+			// eye,
+			// crossAxis,
+			// viewportX,
+			viewportOrigin,
+			viewportFocus
+		})
+	}
 
 	return { viewportOrigin, viewportFocus }
 }
 
-export function cast(world, width, height, camera, port) {
+export function castOne(world, width, height, camera, x, y) {
+	const { viewportOrigin, viewportFocus } = canvasToCameraViewport(camera, x, y, width, height)
+	const r = new Ray3D(viewportOrigin, Direction3D.from(viewportOrigin, viewportFocus))
+	return trace(world, r, true)
+}
+
+export function* cast(world, width, height, camera) {
+	const start = performance.now()
+
 	for(let h = 0; h < height; h += 1) {
 		for(let w = 0; w < width; w += 1) {
 			const { viewportOrigin, viewportFocus } = canvasToCameraViewport(camera, w, h, width, height)
@@ -73,9 +69,10 @@ export function cast(world, width, height, camera, port) {
 				return `color-mix(in lab, ${acc}, ${color})`
 			}, baseColor)
 
-			port.postMessage({
-				x: w, y: h, color
-			})
+			yield { x: w, y: h, color }
 		}
 	}
+
+	const diff = performance.now() - start
+	console.log(`finished in ${diff} ms`)
 }

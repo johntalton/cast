@@ -1,0 +1,53 @@
+{
+	"views": [
+		{
+			"name": "top",
+			"origin": { "x": 0, "y": 40, "z": -25 },
+			"lookAt": { "x": 0, "y": 0, "z": 0 },
+			"fov": 30,
+			"focalDistance": 100,
+			"viewportWidth": 100, "viewportHeight": 75
+		}
+	],
+	"objects": [
+
+		{
+			"name": "C",
+			"type": "CSG",
+			"operation": "Intersection",
+			"center": { "x": 0, "y": 0, "z": 0 },
+			"objects": [
+				{
+
+					"type": "sphere",
+					"center": { "x": 0, "y": -35, "z": 0 },
+					"radius": 50
+				},
+				{
+					"type": "sphere",
+					"center": { "x": 0, "y": 35, "z": 0 },
+					"radius": 50
+				}
+			]
+		},
+    {
+			"name": "Floor",
+			"type": "plane",
+			"center": { "x": 0, "y": -100, "z": 0 },
+			"normal": { "x": 0, "y": 1, "z": 0 },
+			"material": {
+        "type": "texture",
+				"url": "textures/work&play.png",
+				"scale": 5
+			}
+		}
+
+	],
+	"lights": [
+    {
+      "type": "point",
+      "center": { "x": 200, "y": 150, "z": -200 },
+      "color": "lemonchiffon"
+    }
+  ]
+}

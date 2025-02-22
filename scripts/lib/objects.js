@@ -1,4 +1,4 @@
-import { Direction3D, Intersection3D, Matrix3x3, Ray3D, Vector3D, Vector3DScalar } from './cast.js'
+import { Direction3D, Intersection3D, Matrix3x3, Ray3D, Vector3D, Vector3DScalar } from './maths.js'
 
 export class Object3D {
 	#name
@@ -147,24 +147,6 @@ export class Sphere extends QuadraticObject3D {
 		const c = Vector3D.dotProduct(L, L) - (this.#radius * this.#radius)
 
 		return { a, b, c }
-	// 	// quadratic
-	// 	const discriminate = (b * b) - (4.0 * a * c)
-	// 	if (discriminate < 0) { return [] }
-
-	// 	if (discriminate === 0) {
-	// 		const t = -b / (2 * a)
-	// 		return [new Intersection3D(ray, t, this, false)]
-	// 	}
-
-	// 	const t1 = (-b + Math.sqrt(discriminate)) / (2 * a)
-	// 	const t2 = (-b - Math.sqrt(discriminate)) / (2 * a)
-
-	// 	// console.log(t1, t2)
-
-	// 	return [
-	// 		new Intersection3D(ray, t1, this, false),
-	// 		new Intersection3D(ray, t2, this, false)
-	// 	]
 	}
 }
 

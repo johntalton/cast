@@ -30,8 +30,8 @@ export async function textureMapper(options) {
 		return uv => {
 			const { u, v, normalU = false, normalV = false } = uv
 
-			const scaledU = normalU ? (u * width * scale) : u
-			const scaledV = normalV ? (v * height * scale) : v
+			const scaledU = normalU ? (u * width * scale) : u * scale
+			const scaledV = normalV ? (v * height * scale) : v * scale
 
 			const modU = Math.round(scaledU) % width
 			const modV = Math.round(scaledV) % height

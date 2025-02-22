@@ -1,4 +1,4 @@
-import { Direction3D } from './cast.js'
+import { Direction3D } from './maths.js'
 import { OBJECTS } from './objects.js'
 import { DEFAULT_MAPPER, MAPPERS } from './mapper.js'
 

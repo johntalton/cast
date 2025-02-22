@@ -1,47 +1,47 @@
+import { Vector2D } from './lib/maths.js'
 
-function initCanvas(canvas, context, world, camera) {
+function initCanvas(canvas, world, camera) {
 	const worker = new Worker('./scripts/worker.js', { type: 'module' })
+
+	worker.onerror = error => console.warn('worker error', error)
 
 	worker.onmessage = message => {
 		const { data } = message
-		const { x, y, color } = data
-		// console.log(data)
-		context.fillStyle = color
-		context.fillRect(x, y, 1, 1)
+		console.log('message from worker', data)
 	}
 
-	// canvas.addEventListener('click', event => {
-	// 	const { offsetX, offsetY } = event
-	// 	// console.log(event)
-	// 	const canvasX = Vector2D.mapRange(offsetX, 0, canvas.clientWidth, 0, canvas.width)
-	// 	const canvasY = Vector2D.mapRange(offsetY, 0, canvas.clientHeight, 0, canvas.height)
+	canvas.addEventListener('click', event => {
+		const { offsetX, offsetY } = event
+		const canvasX = Vector2D.mapRange(offsetX, 0, canvas.clientWidth, 0, canvas.width)
+		const canvasY = Vector2D.mapRange(offsetY, 0, canvas.clientHeight, 0, canvas.height)
 
-	// 	const { viewportOrigin, viewportFocus } = canvasToCameraViewport(camera, canvasX, canvasY, canvas.width, canvas.height, true)
-	// 	// console.log({ canvasX, canvasY, offsetX, offsetY }, p)
-	// 	const r = new Ray3D(viewportOrigin, Direction3D.from(viewportOrigin, viewportFocus))
+		worker.postMessage({
+			type: 'trace',
+			x: canvasX,
+			y: canvasY
+		})
+	})
 
-	// 	const color = trace(world, r, true)
-	// 	console.log(color)
-	// })
-
-	// cast(world, canvas.width, canvas.height, camera, worker)
+	const offscreenCanvas = canvas.transferControlToOffscreen()
 
 	worker.postMessage({
 		type: 'cast',
+		canvas: offscreenCanvas,
 		world,
 		camera,
-		height: canvas.height,
-		width: canvas.width,
+		// height: canvas.height,
+		// width: canvas.width,
+	}, {
+		transfer: [ offscreenCanvas ]
 	})
 }
-
 
 function loadWorld(worldSrc) {
 	return fetch(worldSrc, { mode: 'cors' })
 		.then(response => response.json())
 		.then(async world => {
 			const mainElem = document.querySelector('main[data-multi]')
-
+			if(mainElem === null) { throw new Error('missing main') }
 			const existing = mainElem.querySelectorAll('main > section')
 			existing.forEach(s => s.remove())
 
@@ -50,27 +50,21 @@ function loadWorld(worldSrc) {
 
 			world.views?.forEach(view => {
 				const clone = viewTemplate.content.cloneNode(true)
+				if(!(clone instanceof DocumentFragment)) { throw new Error('clone is not fragment') }
 				const sectionElem = clone.querySelector('section')
+				if(sectionElem === null) { throw new Error('missing section in template') }
 				const output = sectionElem.querySelector('output')
 				const canvas = sectionElem.querySelector('canvas')
 
 				if(canvas === null) { throw new Error('missing canvas') }
 				if(!(canvas instanceof HTMLCanvasElement)) { throw new Error('canvas not a Canvas') }
 
-				const context = canvas.getContext('2d', {
-					alpha: true,
-					colorSpace: 'display-p3'
-				})
-
-				if(context === null) { throw new Error('failed to create canvas context') }
-
+				if(output === null) { throw new Error('missing output') }
 				output.value = view.name ?? ''
 
 				mainElem?.append(sectionElem)
 
-				initCanvas(canvas, context, world, view)
-
-				return clone
+				initCanvas(canvas, world, view)
 			})
 		})
 		.catch(e => {
