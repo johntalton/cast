@@ -1,24 +1,28 @@
 
 export function checkerMapper(options) {
+	const NORMAL_SCALE = 8
 	const checkerWidth = options?.width ?? 20
 	const checkerHeight = options?.height ?? 20
-	const [ oddColor, evenColor ] = Array.isArray(options?.color) ? options.color : [ options?.color ?? DEFAULT_COLOR, 'white' ]
+	const scale = options?.scale ?? NORMAL_SCALE
+	const [ oddColor, evenColor ] = Array.isArray(options?.color) ? options.color : [ options?.color ?? DEFAULT_COLOR, SECOND_DEFAULT_COLOR ]
 
 	return uv => {
-		const { u, v, normal } = uv
+		const { u, v, normalU, normalV } = uv
 
-		const _u = normal ? (u * checkerWidth * 8) : u
-		const _v = normal ? (v * checkerHeight * 8) : v
+		const _u = normalU ? (u * checkerWidth * scale) : u
+		const _v = normalV ? (v * checkerHeight * scale) : v
 
-		const normalU = Math.abs(Math.round(_u / checkerWidth))
-		const normalV = Math.abs(Math.round(_v / checkerHeight))
+		const scaledU = Math.abs(Math.round(_u / checkerWidth))
+		const scaledV = Math.abs(Math.round(_v / checkerHeight))
 
-		return (normalU % 2 === normalV % 2) ? oddColor : evenColor
+		return (scaledU % 2 === scaledV % 2) ? oddColor : evenColor
 	}
 }
 
 export async function textureMapper(options) {
+	const NORMAL_SCALE = 1
 	const url = options?.url ?? ''
+	const scale = options?.scale ?? NORMAL_SCALE
 
 	function makeMapperFn(imageData) {
 		const { width, height, data } = imageData
@@ -26,8 +30,8 @@ export async function textureMapper(options) {
 		return uv => {
 			const { u, v, normalU = false, normalV = false } = uv
 
-			const scaledU = normalU ? (u * width) : u
-			const scaledV = normalV ? (v * height) : v
+			const scaledU = normalU ? (u * width * scale) : u
+			const scaledV = normalV ? (v * height * scale) : v
 
 			const modU = Math.round(scaledU) % width
 			const modV = Math.round(scaledV) % height
@@ -46,33 +50,32 @@ export async function textureMapper(options) {
 		}
 	}
 
-	const { resolve, reject, promise } = Promise.withResolvers()
-
-	const image = new Image()
-	image.src = url
-	image.onload = event => {
-		const offscreen = new OffscreenCanvas(image.naturalWidth, image.naturalHeight)
-		const context = offscreen.getContext('2d', { colorSpace: 'display-p3' })
-		if(context === null) {
-			reject(new Error('failed to create offscreen canvas for texture'))
-			return
-		}
-		context.drawImage(image, 0, 0)
-		const data = context.getImageData(0, 0, offscreen.width, offscreen.height, { colorSpace: 'display-p3' })
-		resolve(makeMapperFn(data))
+	const _url = new URL(url, self.location.origin)
+	const response = await fetch(_url, { mode: 'cors' })
+	if(!response.ok) {
+		// console.log(response)
+		throw new Error(`failed to fetch image url ${_url}`)
 	}
-	image.onerror = event => reject(new Error('unable to load url'))
+	const blob = await response.blob()
+	const image = await createImageBitmap(blob)
 
-	return promise
+	const offscreen = new OffscreenCanvas(image.width, image.height)
+	const context = offscreen.getContext('2d', { colorSpace: 'display-p3' })
+	if(context === null) { throw new Error('failed to create offscreen canvas for texture') }
+	context.drawImage(image, 0, 0)
+	image.close()
+	const data = context.getImageData(0, 0, offscreen.width, offscreen.height, { colorSpace: 'display-p3' })
+	return makeMapperFn(data)
 }
 
 export function colorMapper(options) {
-	return uv => {
-		return (Array.isArray(options?.color) ? options.color[0] : options?.color) ?? DEFAULT_COLOR
-	}
+	const color = (Array.isArray(options?.color) ? options.color[0] : options?.color) ?? DEFAULT_COLOR
+
+	return uv => color
 }
 
 export const DEFAULT_COLOR = 'red'
+export const SECOND_DEFAULT_COLOR = 'white'
 export const DEFAULT_MAPPER = 'color'
 export const MAPPERS = {
 	'checker': checkerMapper,

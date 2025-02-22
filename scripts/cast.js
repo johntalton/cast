@@ -309,6 +309,35 @@ export class Matrix3x3 {
 export class Direction3D {
 	#vector
 
+	static random() {
+		return new Direction3D({
+			x: Math.random(),
+			y: Math.random(),
+			z: Math.random()
+		})
+	}
+
+	static lookAt(view) {
+		const { origin, lookAt: at, normal: overrideNormal, direction: overrideDirection } = view
+
+		if(overrideNormal !== undefined && overrideDirection !== undefined) {
+			return {
+				direction: new Direction3D(overrideDirection),
+				normal: new Direction3D(overrideNormal)
+			}
+		}
+
+		const initialDirection = new Direction3D({ x: 0, y: 0, z: 1 })
+		const initialNormal = new Direction3D({ x: 0, y: 1, z: 0 })
+
+		const direction = Direction3D.from(origin, at)
+
+		const rotation = Matrix3x3.alignment(initialDirection, direction)
+		const normal = Vector3D.normalized(Matrix3x3.multiply(rotation, initialNormal))
+
+		return { direction, normal }
+	}
+
 	static from(p1, p2) {
 		return new Direction3D(Vector3D.subtract(p2, p1))
 	}

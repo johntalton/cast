@@ -7,7 +7,7 @@
 			"_normal": { "x": 0, "y": 1, "z": 0 },
 			"lookAt": { "x": 0, "y": -20, "z": -80 },
 			"fov": 30,
-			"focalDistance": 1,
+			"focalDistance": 80,
 			"viewportWidth": 200, "viewportHeight": 150
 		},
 		{
@@ -15,7 +15,7 @@
 			"origin": { "x": 0, "y": 100, "z": -100 },
 			"lookAt": { "x": 0, "y": -20, "z": -80 },
 			"fov": 30,
-			"focalDistance": 1,
+			"focalDistance": 100,
 			"viewportWidth": 200, "viewportHeight": 150
 		},
 		{
@@ -23,7 +23,7 @@
 			"origin": { "x": -200, "y": -20, "z": -80 },
 			"lookAt": { "x": 0, "y": -20, "z": -80 },
 			"fov": 30,
-			"focalDistance": 1,
+			"focalDistance": 100,
 			"viewportWidth": 200, "viewportHeight": 150
 		},
 		{
@@ -31,7 +31,7 @@
 			"origin": { "x": 0, "y": -20, "z": -200 },
 			"lookAt": { "x": 0, "y": -20, "z": -80 },
 			"fov": 30,
-			"focalDistance": 1,
+			"focalDistance": 100,
 			"viewportWidth": 200, "viewportHeight": 150
 		}
 
@@ -56,7 +56,6 @@
 			"material": {
 				"type": "checker",
 				"width": 27,
-				"depth": 27,
 				"height": 27,
 				"color": [ "green", "lime" ]
 			}
@@ -68,6 +67,7 @@
 			"radius": 40,
 			"material": {
 				"type": "checker",
+				"scale": 4,
 				"color": "blue"
 			}
 		},
