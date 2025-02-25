@@ -32,7 +32,7 @@
 			"radius": 30,
 			"material": {
 				"type": "texture",
-				"url": "textures/EarthMap_2500x1250.jpg",
+				"url": "../textures/EarthMap_2500x1250.jpg",
 				"color": "green"
 			}
 		},
@@ -88,7 +88,7 @@
 			"normal": { "x": -1, "y": 0, "z": 0 },
 			"material": {
 				"type": "texture",
-				"url": "textures/stones1.jpg",
+				"url": "../textures/stones1.jpg",
 				"color": "color-mix(in lab, white 70%, blue)"
 			}
 		},

@@ -44,7 +44,7 @@
 			"normal": { "x": 0, "y": 1, "z": 0 },
 			"material": {
         "type": "texture",
-				"url": "textures/work&play.png",
+				"url": "../textures/work&play.png",
 				"scale": 5,
 				"reflection": true
 			}

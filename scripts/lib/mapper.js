@@ -50,7 +50,7 @@ export async function textureMapper(options) {
 		}
 	}
 
-	const _url = new URL(url, self.location.origin)
+	const _url = new URL(url, self.location.href)
 	const response = await fetch(_url, { mode: 'cors' })
 	if(!response.ok) {
 		// console.log(response)
