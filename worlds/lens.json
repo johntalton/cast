@@ -2,7 +2,7 @@
 	"views": [
 		{
 			"name": "top",
-			"origin": { "x": 0, "y": 40, "z": -25 },
+			"origin": { "x": 0, "y": 40, "z": -30 },
 			"lookAt": { "x": 0, "y": 0, "z": 0 },
 			"fov": 30,
 			"focalDistance": 100,
@@ -10,7 +10,6 @@
 		}
 	],
 	"objects": [
-
 		{
 			"name": "C",
 			"type": "CSG",
@@ -20,25 +19,34 @@
 				{
 
 					"type": "sphere",
-					"center": { "x": 0, "y": -35, "z": 0 },
-					"radius": 50
+					"center": { "x": 0, "y": -80, "z": 0 },
+					"radius": 90
 				},
 				{
 					"type": "sphere",
-					"center": { "x": 0, "y": 35, "z": 0 },
-					"radius": 50
+					"center": { "x": 0, "y": 80, "z": 0 },
+					"radius": 90
 				}
-			]
+			],
+			"material": {
+				"refraction": 1.5,
+				"reflection": true,
+				"specular": 5,
+				"diffuse": 1,
+				"gloss": 50,
+				"color": "lightblue"
+			}
 		},
     {
 			"name": "Floor",
 			"type": "plane",
-			"center": { "x": 0, "y": -100, "z": 0 },
+			"center": { "x": 95, "y": -150, "z": 0 },
 			"normal": { "x": 0, "y": 1, "z": 0 },
 			"material": {
         "type": "texture",
 				"url": "textures/work&play.png",
-				"scale": 5
+				"scale": 5,
+				"reflection": true
 			}
 		}
 
@@ -46,8 +54,9 @@
 	"lights": [
     {
       "type": "point",
-      "center": { "x": 200, "y": 150, "z": -200 },
-      "color": "lemonchiffon"
+      "center": { "x": 75, "y": 200, "z": -100 },
+      "color": "white",
+			"intensity": 1
     }
   ]
 }

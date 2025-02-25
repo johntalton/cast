@@ -338,6 +338,26 @@ export class Direction3D {
 		return { direction, normal }
 	}
 
+	static refractionOf(incident, normal, fromIndexOf, toIndexOf) {
+		const ratio = fromIndexOf / toIndexOf
+
+		const cosTheta = -Vector3D.dotProduct(incident, normal)
+		const determinate = (ratio * ratio) * (1.0 - cosTheta * cosTheta)
+		if(determinate < 0) {
+			// total internal refraction
+			return undefined
+		}
+
+		return new Direction3D(Vector3D.add(
+			Vector3DScalar.multiply(incident, ratio),
+			Vector3DScalar.multiply(normal, (ratio * cosTheta) - Math.sqrt(1.0 - determinate))
+		))
+	}
+
+	static reflectionOf(incident, normal) {
+		return new Direction3D(Vector3D.subtract(incident, Vector3DScalar.multiply(normal, 2 * Vector3D.dotProduct(incident, normal))))
+	}
+
 	static from(p1, p2) {
 		return new Direction3D(Vector3D.subtract(p2, p1))
 	}
@@ -379,7 +399,9 @@ export class Intersection3D {
 	#distance
 	#object
 	#entering
-	#invert = false
+	// #invert = false
+
+	#cache = {}
 
 	constructor(ray, distance, object, entering) {
 		this.#ray = ray
@@ -388,37 +410,47 @@ export class Intersection3D {
 		this.#entering = entering
 	}
 
-	static invert(intersection) {
-		const i = new Intersection3D(
-			intersection.#ray,
-			intersection.#distance,
-			intersection.#object,
-			intersection.#entering
-		)
-		i.#invert = true
+	// static invert(intersection) {
+	// 	const i = new Intersection3D(
+	// 		intersection.#ray,
+	// 		intersection.#distance,
+	// 		intersection.#object,
+	// 		intersection.#entering
+	// 	)
+	// 	i.#invert = true
 
-		return i
-	}
+	// 	return i
+	// }
 
 	get ray() { return this.#ray }
 	get distance() { return this.#distance }
 	get object() { return this.#object }
 	get entering() {
-		if(this.#invert) { return !this.#entering }
+		// if(this.#invert) { return !this.#entering }
 		return this.#entering
 	}
 
 	get at() {
-		return this.#ray.at(this.distance)
+		if(this.#cache.at === undefined) {
+			this.#cache.at = this.#ray.at(this.distance)
+		}
+		return this.#cache.at
 	}
 
 	get color() {
-		return this.#object.colorAt(this.at)
+		if(this.#cache.color === undefined) {
+			this.#cache.color = this.#object.colorAt(this.at)
+		}
+		return this.#cache.color
 	}
 
 	get normal() {
-		if(this.#invert) { return Vector3D.negate(this.#object.normalAt(this.at)) }
-		return this.#object.normalAt(this.at)
+		// if(this.#invert) { return Vector3D.negate(this.#object.normalAt(this.at)) }
+
+		if(this.#cache.normal === undefined) {
+			this.#cache.normal = this.#object.normalAt(this.at)
+		}
+		return this.#cache.normal
 	}
 
 	// toString() {}
@@ -432,5 +464,9 @@ export class Vector2D {
 	static mapRange(value, sourceStart, sourceEnd, destinationStart, destinationEnd) {
 		const delta = (value - sourceStart) / (sourceEnd - sourceStart)
 		return Vector2D.lerp(delta, destinationStart, destinationEnd)
+	}
+
+	static distance(from, to) {
+		return Math.sqrt(Math.pow(to.x - from.x, 2) + Math.pow(to.y - from.y, 2))
 	}
 }

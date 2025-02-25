@@ -1,6 +1,8 @@
 import { Direction3D, Ray3D, Vector2D, Vector3D, Vector3DScalar } from './lib/maths.js'
 import { trace } from './lib/trace.js'
 
+const DEPTH = 5
+
 function canvasToCameraViewport(camera, canvasX, canvasY, canvasWidth, canvasHeight, debug) {
 
 	const viewportWidthDiv2 = camera.viewportWidth / 2
@@ -45,11 +47,14 @@ function canvasToCameraViewport(camera, canvasX, canvasY, canvasWidth, canvasHei
 export function castOne(world, width, height, camera, x, y) {
 	const { viewportOrigin, viewportFocus } = canvasToCameraViewport(camera, x, y, width, height)
 	const r = new Ray3D(viewportOrigin, Direction3D.from(viewportOrigin, viewportFocus))
-	return trace(world, r, true)
+
+	const depth = DEPTH
+	return trace(world, r, 'EYE', depth, true)
 }
 
 export function* cast(world, width, height, camera) {
 	const start = performance.now()
+	const depth = DEPTH
 
 	for(let h = 0; h < height; h += 1) {
 		for(let w = 0; w < width; w += 1) {
@@ -59,11 +64,11 @@ export function* cast(world, width, height, camera) {
 			const colors = offsets.reduce((acc, offset) => {
 				const offsetViewportOrigin = Vector3D.add(viewportOrigin, offset)
 				const r = new Ray3D(offsetViewportOrigin, Direction3D.from(offsetViewportOrigin, viewportFocus))
-				return [ ...acc, trace(world, r, false) ]
+				return [ ...acc, trace(world, r, 'EYE', depth, false) ]
 			}, [ ])
 
 			const r = new Ray3D(viewportOrigin, Direction3D.from(viewportOrigin, viewportFocus))
-			const baseColor = trace(world, r, false)
+			const baseColor = trace(world, r, 'EYE', depth, false)
 
 			const color = colors.reduce((acc, color) => {
 				return `color-mix(in lab, ${acc}, ${color})`

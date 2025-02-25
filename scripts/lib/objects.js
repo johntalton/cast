@@ -23,10 +23,11 @@ export class Object3D {
 	}
 
 	colorAt(point) {
-		const UV = this.uvAt(point)
-
 		const mapper = this.material.mapper
-		if(mapper) { return mapper(UV) }
+		if(mapper !== undefined) {
+			const UV = this.uvAt(point)
+			return mapper(UV)
+		}
 		return this.material.color
 	}
 
@@ -350,10 +351,6 @@ export class CSG extends Object3D {
 		this.#objects = options.objects ?? []
 	}
 
-	normalAt(point) {
-		return this.#objects[0].normalAt(point)
-	}
-
 	static merge(object, left, right, operation, debug) {
 		function union(enteringL, enteringR) { return enteringL || enteringR }
 		function intersection(enteringL, enteringR) { return enteringL && enteringR }
@@ -399,14 +396,14 @@ export class CSG extends Object3D {
 				}
 
 				if(drop) { return acc }
-				//if(drop) { return { ...acc, previous: e } }
+				// if(drop) { return { ...acc, previous: e } }
 
 				return {
 					previous: e,
 					result: [ ...acc.result, new Intersection3D(
 						item.intersection.ray,
 						item.intersection.distance,
-						object,
+						item.intersection.object, //object,
 						e) ]
 				}
 			}, {

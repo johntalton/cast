@@ -7,7 +7,7 @@
 			"_normal": { "x": 0, "y": 1, "z": 0 },
 			"lookAt": { "x": 0, "y": -20, "z": -80 },
 			"fov": 30,
-			"focalDistance": 80,
+			"focalDistance": 125,
 			"viewportWidth": 200, "viewportHeight": 150
 		},
 		{
@@ -40,16 +40,21 @@
 		{
 			"name": "A",
 			"type": "sphere",
-			"center": { "x": -100, "y": -20, "z": -80 },
+			"center": { "x": -100, "y": 20, "z": -80 },
 			"radius": 40,
 			"material": {
-				"color": "red"
+				"color": "white",
+				"refraction": 1.9,
+				"reflection": true,
+				"specular": 15,
+				"diffuse": 0.05,
+				"gloss": 1
 			}
 		},
     {
 			"name": "B",
 			"type": "cube",
-			"center": { "x": 0, "y": -20, "z": -80 },
+			"center": { "x": 0, "y": -50, "z": -50 },
 			"width": 80,
 			"height": 80,
 			"depth": 80,
@@ -63,11 +68,11 @@
     {
 			"name": "C",
 			"type": "sphere",
-			"center": { "x": 100, "y": -20, "z": -80 },
+			"center": { "x": 100, "y": -20, "z": -10 },
 			"radius": 40,
 			"material": {
 				"type": "checker",
-				"scale": 4,
+				"scale": 6,
 				"color": "blue"
 			}
 		},
@@ -78,9 +83,11 @@
 			"center": { "x": 0, "y": -100, "z": 0 },
 			"normal": { "x": 0, "y": 1, "z": 0 },
 			"material": {
-        "type": "checker",
-        "width": 75, "height": 75,
-				"color": [ "black", "white" ]
+        "color": "white",
+				"reflection": true,
+				"specular": 5,
+				"diffuse": 0.5,
+				"gloss": 100
 			}
 		}
 
@@ -88,7 +95,7 @@
 	"lights": [
     {
       "type": "point",
-      "center": { "x": 200, "y": 150, "z": -200 },
+      "center": { "x": 100, "y": 300, "z": 300 },
       "color": "lemonchiffon"
     }
   ]

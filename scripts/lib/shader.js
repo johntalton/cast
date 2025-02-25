@@ -1,27 +1,30 @@
-import { Vector3D, Vector3DScalar } from './maths.js'
+import { Direction3D, Vector3D, Vector3DScalar } from './maths.js'
 
 const ambient = 1
-const light_intensity = 1.5
-const diffuse = .5
 
-const gloss = 100
-const specular = 5
-
+const DEFAULT_PHONG_DIFFUSE = .5
+const DEFAULT_PHONG_GLOSS = 1
+const DEFAULT_PHONG_SPECULAR = 0
 
 export class Shader {
 	static phong(intersection, lightInfo, debug) {
+		const diffuse = intersection.object.material.diffuse ?? DEFAULT_PHONG_DIFFUSE
+		const gloss = intersection.object.material.gloss ?? DEFAULT_PHONG_GLOSS
+		const specular = intersection.object.material.specular ?? DEFAULT_PHONG_SPECULAR
+
 		const N = intersection.normal
 		const L = lightInfo.direction
-		const V = Vector3D.normalized(Vector3D.negate(intersection.ray.direction))
+		const V = Vector3D.negate(intersection.ray.direction)
 		const I = Vector3D.negate(L)
 
-		const div = 2 * Vector3D.dotProduct(N, L)
-		const R = Vector3D.normalized(Vector3D.add(N, Vector3DScalar.divide(I, div)))
+		// const div = 2 * Vector3D.dotProduct(N, L)
+		// const R = Vector3D.normalized(Vector3D.add(N, Vector3DScalar.divide(I, div)))
+		 const R = Direction3D.reflectionOf(I, N)
 
 		const hasShadow = lightInfo.inShadow
 		const lightColor = lightInfo.color
 
-		const d = !hasShadow ? Math.max(0, Math.min(1, (diffuse * (Vector3D.dotProduct(N, L) * light_intensity)))) : 0
+		const d = !hasShadow ? Math.max(0, Math.min(1, (diffuse * (Vector3D.dotProduct(N, L) * lightInfo.intensity)))) : 0
 
     const angle = Vector3D.dotProduct(V, R)
 		const s = (angle > 0 && !hasShadow) ? Math.min(1, (specular * Math.pow(angle, gloss))) : 0
@@ -46,7 +49,7 @@ export class Shader {
 		const albedo = .18
 
 
-		const x = (albedo / Math.PI) * (light_intensity * 10) * Math.max(0, Vector3D.dotProduct(N, L))
+		const x = (albedo / Math.PI) * (lightInfo.intensity * 10) * Math.max(0, Vector3D.dotProduct(N, L))
 		if(debug) { console.log({ x } ) }
 		const color = `color(from ${intersection.color} srgb calc(r * ${x}) calc(g * ${x}) calc(b * ${x}))`
 		return color
@@ -55,7 +58,6 @@ export class Shader {
 	static depth(intersection, lightInfo, debug) {
 		const d = intersection.distance / 1000
 		return `color(from white srgb calc(${d} * r) calc(${d} * g) calc(${d} * b))`
-
 	}
 
 	static lighting(intersection, lightInfo, debug) {

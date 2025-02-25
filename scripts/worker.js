@@ -17,7 +17,7 @@ function handleCast(data) {
 	})
 	if(context === null) { throw new Error('failed to create canvas context') }
 
-	// const imageData = context.getImageData(0, 0, width, height)
+	// const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
 
 	World.futureWorld(world)
 		.then(async realWorld => {
@@ -29,7 +29,7 @@ function handleCast(data) {
 			for(const { x, y, color } of cast(config.world, config.width, config.height, config.camera)) {
 				context.fillStyle = color
 				context.fillRect(x, y, 1, 1)
-				// const index = (y * width + x) * 4
+				// const index = (y * config.width + x) * 4
 				// imageData.data[index] =  Math.random() * 255
 				// imageData.data[index + 1] = Math.random() * 255
 				// imageData.data[index + 2] =  Math.random() * 255

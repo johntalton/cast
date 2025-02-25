@@ -2,14 +2,19 @@
 	"views": [
 		{
 			"name": "default",
-			"origin": { "x": 2, "y": 2, "z": -4 },
+			"origin": { "x": 1, "y": 2, "z": -5 },
 			"lookAt": { "x": 0, "y": 0, "z": 0 },
-			"fov": 30,
-			"focalDistance": 5,
-			"viewportWidth": 4, "viewportHeight": 3
+			"fov": 25,
+			"focalDistance": 2,
+			"viewportWidth": 2, "viewportHeight": 1.5
 		}
 	],
 	"objects": [
+		{
+			"type": "cylinder",
+			"center": { "x": 0, "y": 0, "z": 0 },
+			"radius": 0.25
+		},
 		{
 			"name": "A",
 			"type": "csg",
@@ -38,7 +43,8 @@
 							"center": { "x": 0, "y": 0, "z": 0.85 },
 							"radius": 1
 						}
-					]
+					],
+					"material": { "color": "white" }
 				}
 			],
 			"material": {
@@ -51,8 +57,9 @@
 	"lights": [
     {
       "type": "point",
-      "center": { "x": 5, "y": 15, "z":-15 },
-      "color": "white"
+      "center": { "x": 0, "y": 0.5, "z": -5 },
+      "color": "red",
+			"intensity": 5
     }
   ]
 }
