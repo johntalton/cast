@@ -1,0 +1,140 @@
+{
+	"views": [
+    {
+			"origin": { "x": 0, "y": 0, "z": -100 },
+			"lookAt": { "x": 0, "y": -10, "z": -10 },
+			"fov": 60,
+			"focalDistance": 100,
+			"viewportWidth": 200, "viewportHeight": 150
+		}
+  ],
+	"objects": [
+    {
+      "name": "top",
+      "type": "CSG",
+      "operation": "difference",
+      "center": { "x": 0, "y": 0, "z": 0 },
+      "objects": [
+        {
+          "name": "top-lid",
+          "type": "cube",
+          "center": { "x": 0, "y": 100, "z": 0 },
+          "normal": { "x": 0, "y": -1, "z": 0 },
+          "height": 10,
+          "width": 200,
+          "depth": 200
+        },
+        {
+          "name": "top-cutout",
+          "type": "cube",
+          "center": { "x": 0, "y": 100, "z": 0 },
+          "height": 11,
+          "width": 100,
+          "depth": 100
+        }
+      ],
+      "material": {
+        "color": "white"
+      }
+    }
+		,
+		{
+      "name": "left",
+			"type": "plane",
+			"center": { "x": -100, "y": 0, "z": 0 },
+      "normal": { "x": 1, "y": 0, "z": 0 },
+			"material": {
+				"color": "red",
+        "diffuse": 5,
+        "specular": 0.5,
+        "gloss": 100
+			}
+		},
+		{
+      "name": "right",
+			"type": "plane",
+			"center": { "x": 100, "y": 0, "z": 0 },
+      "normal": { "x": -1, "y": 0, "z": 0 },
+			"material": {
+				"color": "green",
+        "diffuse": 5,
+        "specular": 0.5,
+        "gloss": 100
+			}
+		},
+		{
+      "name": "bottom",
+			"type": "plane",
+			"center": { "x": 0, "y": -100, "z": 0 },
+      "normal": { "x": 0, "y": 1, "z": 0 },
+			"material": {
+				"color": "white",
+        "reflection": true
+			}
+		},
+		{
+      "name": "back",
+			"type": "plane",
+			"center": { "x": 0, "y": 0, "z": 100 },
+      "normal": { "x": 0, "y": 0, "z": -1 },
+			"material": {
+				"color": "white",
+        "diffuse": 5,
+        "specular": 0.5,
+        "gloss": 100
+			}
+		},
+
+
+    {
+      "type": "sphere",
+      "center": { "x": 0, "y": -70, "z": -10 },
+      "radius": 30,
+      "material": {
+        "color": "white",
+				"refraction": 1.4,
+				"reflection": true,
+				"specular": 15,
+				"diffuse": 5,
+				"gloss": 10
+      }
+    },
+    {
+      "type": "sphere",
+      "center": { "x": 50, "y": -70, "z": 70 },
+      "radius": 30,
+      "material": {
+        "color": "blue",
+        "specular": 0.125
+      }
+    },
+    {
+      "type": "cube",
+      "center": { "x": -50, "y": -60, "z": 40 },
+      "height": 80,
+      "width": 50,
+      "depth": 20,
+
+      "transform": [
+        { "rotateY": 45 }
+      ],
+
+      "material": {
+        "color": "yellow",
+				"reflection": false,
+				"specular": 15,
+				"diffuse": 0.5,
+				"gloss": 10
+      }
+    }
+
+	],
+	"lights": [
+    {
+      "type": "point",
+      "center": { "x": 0, "y": 150, "z": 0 },
+      "intensity": 0.4,
+      "color": "white"
+    }
+  ]
+}

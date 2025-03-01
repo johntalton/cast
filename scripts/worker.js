@@ -10,6 +10,7 @@ const config = {
 
 function handleCast(data) {
 	const { canvas, world, camera } = data
+	// console.log('cast requested')
 
 	const context = canvas.getContext('2d', {
 		alpha: true,
@@ -26,7 +27,7 @@ function handleCast(data) {
 			config.height = canvas.height
 			config.camera = await World.futureView(camera)
 
-			for(const { x, y, color } of cast(config.world, config.width, config.height, config.camera)) {
+			for(const { x, y, color } of cast(config.world, config.width, config.height, config.camera, 0, config.width, 0, config.height)) {
 				context.fillStyle = color
 				context.fillRect(x, y, 1, 1)
 				// const index = (y * config.width + x) * 4
@@ -37,6 +38,7 @@ function handleCast(data) {
 			}
 
 			// context.putImageData(imageData, 0, 0)
+			globalThis.postMessage({ type: 'done' })
 		})
 		.catch(e => console.warn(e))
 }
@@ -47,9 +49,12 @@ function handleTrace(data) {
 	console.log(color)
 }
 
-self.onmessage = message => {
+
+globalThis.onmessage = message => {
 	const { data } = message
 	const { type } = data
+
+	// console.log('worker message', type)
 
 	switch(type) {
 		case 'cast':
@@ -63,4 +68,3 @@ self.onmessage = message => {
 			break
 	}
 }
-

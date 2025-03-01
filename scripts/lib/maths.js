@@ -394,20 +394,25 @@ export class Ray3D {
 	}
 }
 
+let id = 0
+
 export class Intersection3D {
 	#ray
 	#distance
 	#object
 	#entering
-	// #invert = false
+	#invert
 
 	#cache = {}
 
-	constructor(ray, distance, object, entering) {
+	constructor(ray, distance, object, entering, invert = false) {
+		this.id = id += 1
+
 		this.#ray = ray
 		this.#distance = distance
 		this.#object = object
 		this.#entering = entering
+		this.#invert = invert
 	}
 
 	// static invert(intersection) {
@@ -445,10 +450,9 @@ export class Intersection3D {
 	}
 
 	get normal() {
-		// if(this.#invert) { return Vector3D.negate(this.#object.normalAt(this.at)) }
-
 		if(this.#cache.normal === undefined) {
-			this.#cache.normal = this.#object.normalAt(this.at)
+			const n = this.#object.normalAt(this.at)
+			this.#cache.normal = this.#invert ? Vector3D.negate(n) : n
 		}
 		return this.#cache.normal
 	}

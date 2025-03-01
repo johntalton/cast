@@ -2,7 +2,7 @@
 	"views": [
 		{
 			"name": "default",
-			"origin": { "x": 1, "y": 2, "z": -5 },
+			"origin": { "x": 1, "y": 3, "z": -5 },
 			"lookAt": { "x": 0, "y": 0, "z": 0 },
 			"fov": 25,
 			"focalDistance": 2,
@@ -15,40 +15,53 @@
 			"center": { "x": 0, "y": 0, "z": 0 },
 			"radius": 0.25
 		},
+
 		{
 			"name": "A",
 			"type": "csg",
-			"operation": "difference",
+			"operation": "intersection",
 			"center": { "x": 0, "y": 0, "z": 0 },
 			"objects": [
 				{
-					"type": "cube",
-					"center": { "x": 0, "y": 0, "z": 0 },
-					"width": 2,
-					"height": 2,
-					"depth": 2
-				},
-				{
 					"type": "csg",
-					"operation": "union",
-
+					"operation": "difference",
+					"center": { "x": 0, "y": 0, "z": 0 },
 					"objects": [
 						{
-							"type": "sphere",
-							"center": { "x": 0, "y": 0, "z": -0.85 },
-							"radius": 1
+							"type": "cube",
+							"center": { "x": 0, "y": 0, "z": 0 },
+							"width": 2,
+							"height": 2,
+							"depth": 2
 						},
 						{
-							"type": "sphere",
-							"center": { "x": 0, "y": 0, "z": 0.85 },
-							"radius": 1
+							"type": "csg",
+							"operation": "union",
+
+							"objects": [
+								{
+									"type": "sphere",
+									"center": { "x": 0, "y": 0, "z": -0.85 },
+									"radius": 0.95
+								},
+								{
+									"type": "sphere",
+									"center": { "x": 0, "y": 0, "z": 0.85 },
+									"radius": 0.95
+								}
+							],
+							"material": { "color": "silver" }
 						}
-					],
-					"material": { "color": "white" }
+					]
+				},
+				{
+					"type": "plane",
+					"center": { "x": 0, "y": 0, "z": 0 },
+					"normal": { "x": 1, "y": 1, "z": 0 }
 				}
 			],
 			"material": {
-				"type": "checker",
+				"_type": "checker",
 				"width": 0.5, "height": 0.5,
 				"color": ["blue", "white"]
 			}

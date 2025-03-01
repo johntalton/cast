@@ -24,10 +24,10 @@ export class Shader {
 		const hasShadow = lightInfo.inShadow
 		const lightColor = lightInfo.color
 
-		const d = !hasShadow ? Math.max(0, Math.min(1, (diffuse * (Vector3D.dotProduct(N, L) * lightInfo.intensity)))) : 0
+		const d = Math.max(0, Math.min(1, (diffuse * (Vector3D.dotProduct(N, L) * lightInfo.intensity))))
 
     const angle = Vector3D.dotProduct(V, R)
-		const s = (angle > 0 && !hasShadow) ? Math.min(1, (specular * Math.pow(angle, gloss))) : 0
+		const s = (angle > 0) ? Math.min(1, (specular * Math.pow(angle, gloss))) : 0
 
 		if(debug) { console.log({ N, L, V, I, angle, s, d } ) }
 
@@ -38,7 +38,7 @@ export class Shader {
 		const _light = `color(from ${lightColor} srgb calc(${s} * r) calc(${s} * g) calc(${s} * b))`
 		const color = `color-mix(in lab, ${_color}, ${_light})`
 
-		return hasShadow ? `color-mix(in lab, black 50%, ${color})` : color
+		return hasShadow ? `color-mix(in lab, black ${lightInfo.shadowPercent * 50}%, ${color})` : color
 
 	}
 

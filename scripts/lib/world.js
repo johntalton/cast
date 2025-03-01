@@ -18,6 +18,9 @@ export class World {
 
 		return new maker({
 			...options,
+			// transform: {
+			// 	toLocal: {}
+			// },
 			material: {
 				...options.material,
 				mapper: await Promise.try(mapperMaker, options.material)

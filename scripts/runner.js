@@ -1,7 +1,7 @@
 import { Direction3D, Ray3D, Vector2D, Vector3D, Vector3DScalar } from './lib/maths.js'
 import { trace } from './lib/trace.js'
 
-const DEPTH = 5
+const DEPTH = 10
 
 function canvasToCameraViewport(camera, canvasX, canvasY, canvasWidth, canvasHeight, debug) {
 
@@ -18,6 +18,7 @@ function canvasToCameraViewport(camera, canvasX, canvasY, canvasWidth, canvasHei
 
 	const crossAxis = Vector3D.crossProduct(camera.normal, camera.direction)
 	const crossR = new Ray3D(camera.origin, crossAxis)
+
 	const viewportX = crossR.at(viewportOffsetX)
 	const normalR = new Ray3D(viewportX, camera.normal)
 	const viewportOrigin = normalR.at(viewportOffsetY)
@@ -52,15 +53,17 @@ export function castOne(world, width, height, camera, x, y) {
 	return trace(world, r, 'EYE', depth, true)
 }
 
-export function* cast(world, width, height, camera) {
+export function* cast(world, width, height, camera, minW, maxW, minH, maxH) {
 	const start = performance.now()
 	const depth = DEPTH
 
-	for(let h = 0; h < height; h += 1) {
-		for(let w = 0; w < width; w += 1) {
+	const offsets = Array.from({ length: 0 }, () => Vector3DScalar.multiply(Direction3D.random(), 1))
+
+	for(let h = minH; h < maxH; h += 1) {
+		for(let w = minW; w < maxW; w += 1) {
 			const { viewportOrigin, viewportFocus } = canvasToCameraViewport(camera, w, h, width, height)
 
-			const offsets = Array.from({ length: 0 }, () => Vector3DScalar.multiply(Direction3D.random(), .125))
+
 			const colors = offsets.reduce((acc, offset) => {
 				const offsetViewportOrigin = Vector3D.add(viewportOrigin, offset)
 				const r = new Ray3D(offsetViewportOrigin, Direction3D.from(offsetViewportOrigin, viewportFocus))

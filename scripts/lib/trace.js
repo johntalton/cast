@@ -9,6 +9,8 @@ const FEATURES = {
 	REFRACTION: true
 }
 
+const lightOffsets = Array.from({ length: 1 }, () => Vector3DScalar.multiply(Direction3D.random(), 0))
+
 export function trace(world, ray, type, depth, debug) {
 	if(debug) { console.log(depth, type, ray) }
 
@@ -65,38 +67,50 @@ export function trace(world, ray, type, depth, debug) {
 			}
 		}
 
+
+
+
 		const lightingInfo = world.lights.map(light => {
-			const lightDirection = Direction3D.from(intersection.at, light.center)
-			if(debug) { console.log({ depth, intersection, lightDirection }) }
+			const primaryLightDirection = Direction3D.from(intersection.at, light.center)
 
-			const shadowRay = new Ray3D(stepOffIntersectionPoint, lightDirection)
+			const shadowSet = lightOffsets.map(lightOffset => {
+				const lightDirection = Direction3D.from(intersection.at, Vector3D.add(light.center, lightOffset))
 
-			const distanceToLight = Vector3D.distance(intersection.at, light.center)
+				if(debug) { console.log({ depth, intersection, lightDirection }) }
 
-			const hasShadow = world.objects.map(shadowObj => {
-				// if(intersection.object === shadowObj) { return false }
+				const shadowRay = new Ray3D(stepOffIntersectionPoint, lightDirection)
 
-				if(debug) { console.log('shadowRay', depth, shadowRay) }
+				const distanceToLight = Vector3D.distance(intersection.at, light.center)
 
-				const shadowIntersections = shadowObj.intersections(shadowRay)
-					// .filter(intersection => intersection.length > 0)
-					.flat(1)
-					.filter(intersection => intersection.distance > 0)
-					.filter(intersection => intersection.distance < distanceToLight)
-					.sort((intersectionA, intersectionB) => {
-						return intersectionA.distance - intersectionB.distance
-					})
+				return world.objects.map(shadowObj => {
+					// if(intersection.object === shadowObj) { return false }
 
-				if(debug) { console.log(depth, intersection.object, shadowObj, shadowIntersections) }
-				return shadowIntersections.length > 0
+					if(debug) { console.log('shadowRay', depth, shadowRay) }
+
+					const shadowIntersections = shadowObj.intersections(shadowRay)
+						// .filter(intersection => intersection.length > 0)
+						.flat(1)
+						.filter(intersection => intersection.distance > 0)
+						.filter(intersection => intersection.distance < distanceToLight)
+						.sort((intersectionA, intersectionB) => {
+							return intersectionA.distance - intersectionB.distance
+						})
+
+					if(debug) { console.log(depth, intersection.object, shadowObj, shadowIntersections) }
+					return shadowIntersections.length > 0
+				})
+				.reduce((acc, hit) => acc || hit, false)
 			})
-			.reduce((acc, hit) => acc || hit, false)
 
+			const shadowPercent = shadowSet.reduce((acc, hasShadow) => acc + (hasShadow ? 1 : 0), 0) / shadowSet.length
+
+			if(debug) { console.log('shaodow percent', shadowSet, shadowPercent) }
 
 			return {
 				...light,
-				direction: lightDirection,
-				inShadow: hasShadow
+				direction: primaryLightDirection,
+				inShadow: shadowPercent > 0,
+				shadowPercent
 			}
 		})
 
@@ -118,7 +132,7 @@ export function trace(world, ray, type, depth, debug) {
 		}
 
 		const shaderColor = Shader.phong(intersection, firstLightInfo, debug)
-		return `color-mix(in lab, color-mix(in lab, ${refractionColor}, ${reflectionColor} 50%), ${shaderColor} 20%)`
+		return `color-mix(in lab, color-mix(in lab, ${refractionColor}, ${reflectionColor} 20%), ${shaderColor} 20%)`
 	}
 
 	return 'lightblue'

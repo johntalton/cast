@@ -3,11 +3,13 @@ import { Direction3D, Intersection3D, Matrix3x3, Ray3D, Vector3D, Vector3DScalar
 export class Object3D {
 	#name
 	#material
+	#transform
 
 	constructor(options) {
-		const { name, material } = options
+		const { name, material, transform } = options
 		this.#name = name
 		this.#material = material ?? { color: 'red' }
+		this.#transform = transform
 	}
 
 	get name() { return this.#name }
@@ -31,11 +33,27 @@ export class Object3D {
 		return this.material.color
 	}
 
+	toLocal(ray) {
+		return ray
+		// if(this.#transform === undefined || this.#transform?.length <= 0) { return ray }
+		// const rotateY = Matrix3x3.rotateZ(- Math.PI / 8)
+		// return new Ray3D(Matrix3x3.multiply(rotateY, ray.origin), Matrix3x3.multiply(rotateY, ray.direction))
+	}
+
+	/**
+	 * @param {Ray3D} globalRay
+	 * @param {Ray3D} localRay
+	 * @returns {Array<Intersection3D>}
+	 */
+	localIntersections(globalRay, localRay) {
+		return []
+	}
+
 	/**
 	 * @param {Ray3D} ray
 	 * @returns {Array<Intersection3D>}
 	 */
-	intersections(ray) { return [ ] }
+	intersections(ray) { return this.localIntersections(ray, this.toLocal(ray)) }
 }
 
 export class QuadraticObject3D extends Object3D {
@@ -56,7 +74,7 @@ export class QuadraticObject3D extends Object3D {
 
 		if (discriminate === 0) {
 			const t = -b / (2 * a)
-			return [new Intersection3D(ray, t, this, false)]
+			return [ new Intersection3D(ray, t, this, false) ]
 		}
 
 		const sqrtDiscriminate = Math.sqrt(discriminate)
@@ -77,6 +95,7 @@ export class QuadraticObject3D extends Object3D {
 export class Plane extends Object3D {
 	#center
 	#normal
+	#uvRotation
 
 	constructor(options) {
 		super(options)
@@ -85,6 +104,8 @@ export class Plane extends Object3D {
 
 		this.#center = center
 		this.#normal = new Direction3D(normal)
+
+		this.#uvRotation = Matrix3x3.alignment(this.#normal, new Direction3D({ x: 0, y: 0, z: -1 }))
 	}
 
 	normalAt(point) {
@@ -93,8 +114,7 @@ export class Plane extends Object3D {
 
 	uvAt(point) {
 		const normalPoint = Vector3D.subtract(point, this.#center)
-		const rotation = Matrix3x3.alignment(this.normalAt(point), new Direction3D({ x: 0, y: 0, z: -1 }))
-		const { x: u, y: v } = Matrix3x3.multiply(rotation, normalPoint)
+		const { x: u, y: v } = Matrix3x3.multiply(this.#uvRotation, normalPoint)
 		return { u, v }
 	}
 
@@ -159,6 +179,7 @@ export class Cube extends Object3D {
 
 	#min
 	#max
+	#d
 
 	constructor(options) {
 		super(options)
@@ -177,6 +198,7 @@ export class Cube extends Object3D {
 		}
 		this.#min = Vector3D.subtract(center, dim)
 		this.#max = Vector3D.add(center, dim)
+		this.#d = Vector3DScalar.divide(Vector3D.subtract(this.#min, this.#max), 2)
 	}
 
 	uvAt(point) {
@@ -188,13 +210,13 @@ export class Cube extends Object3D {
 
 	normalAt(point) {
 		const p = Vector3D.subtract(point, this.#center)
-		const d = Vector3DScalar.divide(Vector3D.subtract(this.#min, this.#max), 2)
-		const n = Vector3D.trunc(Vector3DScalar.multiply(Vector3D.divide(p, Vector3D.abs(d)), 1.0001))
+		const n = Vector3D.trunc(Vector3DScalar.multiply(Vector3D.divide(p, Vector3D.abs(this.#d)), 1.0001))
 
 		return new Direction3D(n)
 	}
 
-	intersections(ray) {
+	localIntersections(globalRay, ray) {
+
 		const inv = Vector3D.invert(ray.direction)
 		const min = Vector3D.multiply(Vector3D.subtract(this.#min, ray.origin), inv)
 		const max = Vector3D.multiply(Vector3D.subtract(this.#max, ray.origin), inv)
@@ -210,8 +232,8 @@ export class Cube extends Object3D {
 		if (near > far) { return [] }
 
 		return [
-			new Intersection3D(ray, near, this, true),
-			new Intersection3D(ray, far, this, false),
+			new Intersection3D(globalRay, near, this, true),
+			new Intersection3D(globalRay, far, this, false),
 		]
 	}
 }
@@ -342,6 +364,19 @@ export class CSG extends Object3D {
 	#center
 	#objects
 	#operation
+	#op
+
+	static union(enteringL, enteringR) { return enteringL || enteringR }
+	static intersection(enteringL, enteringR) { return enteringL && enteringR }
+	static difference(enteringL, enteringR) { return enteringL && !enteringR }
+	static error() { throw new Error('unknown op') }
+
+	static operation(name) {
+		return (name.toUpperCase() === CSG.UNION) ? CSG.union :
+			(name.toUpperCase() === CSG.INTERSECTION) ? CSG.intersection :
+			(name.toUpperCase() === CSG.DIFFERENCE) ? CSG.difference :
+			CSG.error
+	}
 
 	constructor(options) {
 		super(options)
@@ -349,19 +384,11 @@ export class CSG extends Object3D {
 		this.#center = options.center
 		this.#operation = options.operation ?? CSG.UNION
 		this.#objects = options.objects ?? []
+
+		this.#op = CSG.operation(this.#operation)
 	}
 
-	static merge(object, left, right, operation, debug) {
-		function union(enteringL, enteringR) { return enteringL || enteringR }
-		function intersection(enteringL, enteringR) { return enteringL && enteringR }
-		function difference(enteringL, enteringR) { return enteringL && !enteringR }
-		function error() { throw new Error('unknown op') }
-
-		const op = (operation.toUpperCase() === CSG.UNION) ? union :
-			(operation.toUpperCase() === CSG.INTERSECTION) ? intersection :
-			(operation.toUpperCase() === CSG.DIFFERENCE) ? difference :
-			error
-
+	static merge(object, left, right, op, debug) {
 		const lastL = { value: false }
 		const lastR = { value: false }
 
@@ -398,13 +425,18 @@ export class CSG extends Object3D {
 				if(drop) { return acc }
 				// if(drop) { return { ...acc, previous: e } }
 
+				// invert the normal of the intersection
+				const invert = e !== item.intersection.entering
+
+				const inter = new Intersection3D(
+					item.intersection.ray,
+					item.intersection.distance,
+					item.intersection.object, //object,
+					e, invert)
+
 				return {
 					previous: e,
-					result: [ ...acc.result, new Intersection3D(
-						item.intersection.ray,
-						item.intersection.distance,
-						item.intersection.object, //object,
-						e) ]
+					result: [ ...acc.result, inter ]
 				}
 			}, {
 				previous: false,
@@ -418,7 +450,7 @@ export class CSG extends Object3D {
 		const left = this.#objects[0].intersections(ray)
 		const right = this.#objects[1].intersections(ray)
 
-		return CSG.merge(this, left, right, this.#operation, debug)
+		return CSG.merge(this, left, right, this.#op, debug)
 	}
 }
 
