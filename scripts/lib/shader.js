@@ -1,3 +1,4 @@
+import { Color } from './color.js'
 import { Direction3D, Vector3D, Vector3DScalar } from './maths.js'
 
 const ambient = 1
@@ -26,19 +27,34 @@ export class Shader {
 
 		const d = Math.max(0, Math.min(1, (diffuse * (Vector3D.dotProduct(N, L) * lightInfo.intensity))))
 
-    const angle = Vector3D.dotProduct(V, R)
+		const angle = Vector3D.dotProduct(V, R)
 		const s = (angle > 0) ? Math.min(1, (specular * Math.pow(angle, gloss))) : 0
 
 		if(debug) { console.log({ N, L, V, I, angle, s, d } ) }
 
-		const calcR = `calc((${ambient} * r) + (${d} * r))`
-		const calcG = `calc((${ambient} * g) + (${d} * g))`
-		const calcB = `calc((${ambient} * b) + (${d} * b))`
-		const _color = `color(from ${intersection.color} srgb ${calcR} ${calcG} ${calcB})`
-		const _light = `color(from ${lightColor} srgb calc(${s} * r) calc(${s} * g) calc(${s} * b))`
-		const color = `color-mix(in lab, ${_color}, ${_light})`
+		// return intersection.color
 
-		return hasShadow ? `color-mix(in lab, black ${lightInfo.shadowPercent * 50}%, ${color})` : color
+		const color = Color.mix(
+			Color.multiply(intersection.color, ambient),
+			Color.multiply(intersection.color, d),
+			Color.multiply(lightColor, s)
+		)
+
+		if(hasShadow) {
+			return Color.mix(color, Color.multiply(color, 1 - lightInfo.shadowPercent))
+		}
+
+		return color
+
+
+		// const calcR = `calc((${ambient} * r) + (${d} * r))`
+		// const calcG = `calc((${ambient} * g) + (${d} * g))`
+		// const calcB = `calc((${ambient} * b) + (${d} * b))`
+		// const _color = `color(from ${intersection.color} srgb ${calcR} ${calcG} ${calcB})`
+		// const _light = `color(from ${lightColor} srgb calc(${s} * r) calc(${s} * g) calc(${s} * b))`
+		// const color = `color-mix(in lab, ${_color}, ${_light})`
+
+		// return hasShadow ? `color-mix(in lab, black ${lightInfo.shadowPercent * 50}%, ${color})` : color
 
 	}
 
@@ -51,23 +67,37 @@ export class Shader {
 
 		const x = (albedo / Math.PI) * (lightInfo.intensity * 10) * Math.max(0, Vector3D.dotProduct(N, L))
 		if(debug) { console.log({ x } ) }
-		const color = `color(from ${intersection.color} srgb calc(r * ${x}) calc(g * ${x}) calc(b * ${x}))`
-		return color
+
+		return Color.multiply(intersection.color, x)
+		// const color = `color(from ${intersection.color} srgb calc(r * ${x}) calc(g * ${x}) calc(b * ${x}))`
+		// return color
 	}
 
 	static depth(intersection, lightInfo, debug) {
 		const d = intersection.distance / 1000
-		return `color(from white srgb calc(${d} * r) calc(${d} * g) calc(${d} * b))`
+		// return `color(from white srgb calc(${d} * r) calc(${d} * g) calc(${d} * b))`
+		return Color.multiply(Color.from('white'), d)
 	}
 
 	static lighting(intersection, lightInfo, debug) {
 		const L = lightInfo.direction
-		return  `color(from white srgb calc(${L.x} * r) calc(${L.y} * g) calc(${L.z} * b))`
+		// return  `color(from white srgb calc(${L.x} * r) calc(${L.y} * g) calc(${L.z} * b))`
+		const c = Color.from('white')
+		return {
+			r: c.r * L.x,
+			g: c.r * L.y,
+			b: c.r * L.z
+		}
 	}
 
 	static normals(intersection, lightInfo, debug) {
 		const N = intersection.normal
-		 return `rgba(calc((${N.x}) * 255) calc((${N.y}) * 255) calc((${N.z}) * 255))`
+		// return `rgba(calc((${N.x}) * 255) calc((${N.y}) * 255) calc((${N.z}) * 255))`
+		return {
+			r: 255 * N.x,
+			g: 255 * N.y,
+			b: 255 * N.z
+		}
 	}
 
 	static facing(intersection, lightInfo, debug) {
@@ -83,8 +113,10 @@ export class Shader {
 		if(debug) { console.log('N dot V', Vector3D.dotProduct(N, V)) }
 		const facingRatio = !hasShadow ? Math.max(0, Vector3D.dotProduct(N, V)) : 0
 		if(debug) { console.log({ N, L, V, I, facingRatio} ) }
-		const color = `color(from ${intersection.color} srgb calc(r * ${facingRatio}) calc(g * ${facingRatio}) calc(b * ${facingRatio}))`
-		return hasShadow ? 'black' : color
+		// const color = `color(from ${intersection.color} srgb calc(r * ${facingRatio}) calc(g * ${facingRatio}) calc(b * ${facingRatio}))`
+		// return hasShadow ? 'black' : color
+
+		return Color.multiply(intersection.color, facingRatio)
 	}
 
 }

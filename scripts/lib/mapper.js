@@ -1,3 +1,4 @@
+import { Color } from './color.js'
 
 export function checkerMapper(options) {
 	const NORMAL_SCALE = 8
@@ -46,7 +47,8 @@ export async function textureMapper(options) {
 			const b = data[index + 2]
 			const a = data[index + 3] / 255
 
-			return `rgba(${r} ${g} ${b} / ${a})`
+			// return `rgba(${r} ${g} ${b} / ${a})`
+			return { r, g, b }
 		}
 	}
 
@@ -74,8 +76,8 @@ export function colorMapper(options) {
 	return uv => color
 }
 
-export const DEFAULT_COLOR = 'red'
-export const SECOND_DEFAULT_COLOR = 'white'
+export const DEFAULT_COLOR = Color.from('red')
+export const SECOND_DEFAULT_COLOR = Color.from('white')
 export const DEFAULT_MAPPER = 'color'
 export const MAPPERS = {
 	'checker': checkerMapper,

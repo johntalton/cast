@@ -57,9 +57,9 @@
       "normal": { "x": -1, "y": 0, "z": 0 },
 			"material": {
 				"color": "green",
-        "diffuse": 5,
         "specular": 0.5,
-        "gloss": 100
+        "gloss": 10,
+        "diffuse": 0.1
 			}
 		},
 		{
@@ -79,9 +79,9 @@
       "normal": { "x": 0, "y": 0, "z": -1 },
 			"material": {
 				"color": "white",
-        "diffuse": 5,
         "specular": 0.5,
-        "gloss": 100
+        "gloss": 10,
+        "diffuse": 0.1
 			}
 		},
 
@@ -92,25 +92,27 @@
       "radius": 30,
       "material": {
         "color": "white",
-				"refraction": 1.4,
+				"refraction": 1.6,
 				"reflection": true,
-				"specular": 15,
-				"diffuse": 5,
-				"gloss": 10
+				"specular": 5,
+				"diffuse": 500,
+				"gloss": 100
       }
     },
     {
       "type": "sphere",
-      "center": { "x": 50, "y": -70, "z": 70 },
+      "center": { "x": 60, "y": -70, "z": 30 },
       "radius": 30,
       "material": {
         "color": "blue",
-        "specular": 0.125
+        "specular": 0.5,
+        "gloss": 10,
+        "diffuse": 0.1
       }
     },
     {
       "type": "cube",
-      "center": { "x": -50, "y": -60, "z": 40 },
+      "center": { "x": -60, "y": -60, "z": 10 },
       "height": 80,
       "width": 50,
       "depth": 20,
@@ -122,9 +124,9 @@
       "material": {
         "color": "yellow",
 				"reflection": false,
-				"specular": 15,
-				"diffuse": 0.5,
-				"gloss": 10
+				"specular": 0.5,
+        "gloss": 10,
+        "diffuse": 0.1
       }
     }
 
@@ -133,7 +135,7 @@
     {
       "type": "point",
       "center": { "x": 0, "y": 150, "z": 0 },
-      "intensity": 0.4,
+      "intensity": 10,
       "color": "white"
     }
   ]

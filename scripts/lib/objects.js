@@ -1,3 +1,4 @@
+import { Color } from './color.js'
 import { Direction3D, Intersection3D, Matrix3x3, Ray3D, Vector3D, Vector3DScalar } from './maths.js'
 
 export class Object3D {
@@ -8,7 +9,7 @@ export class Object3D {
 	constructor(options) {
 		const { name, material, transform } = options
 		this.#name = name
-		this.#material = material ?? { color: 'red' }
+		this.#material = material ?? { color: Color.from('red') }
 		this.#transform = transform
 	}
 

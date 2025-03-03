@@ -1,10 +1,23 @@
 import { Direction3D } from './maths.js'
 import { OBJECTS } from './objects.js'
 import { DEFAULT_MAPPER, MAPPERS } from './mapper.js'
+import { Color } from './color.js'
 
 const DEFAULT_LIGHT_INTENSITY = 1
 
 export class World {
+	static async futureMaterial(options) {
+
+		const color = Array.isArray(options?.color) ?
+			options.color.map(Color.from) :
+			Color.from(options?.color)
+
+		return {
+			...options,
+			color
+		}
+	}
+
 	static async futureObject(options) {
 		const maker = OBJECTS[(options.type ?? 'sphere').toLowerCase()]
 		const mapperType = options.material?.type ?? DEFAULT_MAPPER
@@ -13,7 +26,9 @@ export class World {
 		if(maker === undefined) { throw new Error(`unknown maker`) }
 		if(mapperMaker === undefined) { throw new Error(`unknown mapper ${mapperType}`) }
 
-		const withMaterial = o => ({ material: options.material, ...o })
+		const material = await World.futureMaterial(options.material)
+
+		const withMaterial = o => ({ material: material, ...o })
 		const objects = options.objects ? await Promise.all(options.objects?.map(withMaterial).map(World.futureObject)) : undefined
 
 		return new maker({
@@ -22,8 +37,8 @@ export class World {
 			// 	toLocal: {}
 			// },
 			material: {
-				...options.material,
-				mapper: await Promise.try(mapperMaker, options.material)
+				...material,
+				mapper: await Promise.try(mapperMaker, material)
 			},
 			objects
 		})
@@ -42,6 +57,7 @@ export class World {
 	static async futureLights(options) {
 		return {
 			...options,
+			color: Color.from(options.color),
 			intensity: options.intensity ?? DEFAULT_LIGHT_INTENSITY
 		}
 	}

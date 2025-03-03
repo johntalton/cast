@@ -78,7 +78,7 @@
 			"material": {
 				"type": "checker",
 				"width": 20, "height": 50,
-				"color": [ "color-mix(in lab, white 70%, red)", "white" ]
+				"color": [ "pink", "white" ]
 			}
 		},
 		{
@@ -89,7 +89,7 @@
 			"material": {
 				"type": "texture",
 				"url": "../textures/stones1.jpg",
-				"color": "color-mix(in lab, white 70%, blue)"
+				"color": "lightblue)"
 			}
 		},
 		{
@@ -97,14 +97,15 @@
 			"type": "plane",
 			"center": { "x": 0, "y": 0, "z": 70 },
 			"normal": { "x": 0, "y": 1, "z": -1 },
-			"material": { "type": "checker", "color": "color-mix(in lab, white 70%, black)" }
+			"material": { "type": "checker", "color": "grey" }
 		}
 	],
 	"lights": [
     {
       "type": "point",
       "center": { "x": -300, "y": 300, "z": -500 },
-      "color": "pink"
+      "color": "pink",
+			"intensity": 1
     }
   ]
 }

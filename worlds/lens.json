@@ -5,7 +5,7 @@
 			"origin": { "x": 0, "y": 40, "z": -30 },
 			"lookAt": { "x": 0, "y": 0, "z": 0 },
 			"fov": 30,
-			"focalDistance": 100,
+			"focalDistance": 20,
 			"viewportWidth": 100, "viewportHeight": 75
 		}
 	],
@@ -31,9 +31,9 @@
 			"material": {
 				"refraction": 1.5,
 				"reflection": true,
-				"specular": 5,
-				"diffuse": 1,
-				"gloss": 50,
+				"specular": 1,
+				"diffuse": 10,
+				"gloss": 100,
 				"color": "lightblue"
 			}
 		},
@@ -46,7 +46,7 @@
         "type": "texture",
 				"url": "../textures/work&play.png",
 				"scale": 5,
-				"reflection": true
+				"reflection": false
 			}
 		}
 
@@ -56,7 +56,7 @@
       "type": "point",
       "center": { "x": 75, "y": 200, "z": -100 },
       "color": "white",
-			"intensity": 1
+			"intensity": 100
     }
   ]
 }

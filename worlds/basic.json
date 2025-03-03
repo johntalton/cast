@@ -48,7 +48,7 @@
 				"reflection": true,
 				"specular": 15,
 				"diffuse": 0.05,
-				"gloss": 1
+				"gloss": 100
 			}
 		},
     {
@@ -93,10 +93,17 @@
 
 	],
 	"lights": [
-    {
-      "type": "point",
-      "center": { "x": 100, "y": 300, "z": 300 },
-      "color": "lemonchiffon"
-    }
-  ]
+		{
+			"type": "point",
+			"center": { "x": 100, "y": 300, "z": 300 },
+			"color": "lemonchiffon",
+			"intensity": 10
+		},
+		{
+			"type": "point",
+			"center": { "x": -300, "y": 500, "z": -200 },
+			"color": "lemonchiffon",
+			"intensity": 10
+		}
+		]
 }

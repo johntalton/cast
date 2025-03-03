@@ -1,3 +1,4 @@
+import { Color } from './color.js'
 import { Direction3D, Ray3D, Vector3D, Vector3DScalar } from './maths.js'
 import { Shader } from './shader.js'
 
@@ -9,7 +10,7 @@ const FEATURES = {
 	REFRACTION: true
 }
 
-const lightOffsets = Array.from({ length: 1 }, () => Vector3DScalar.multiply(Direction3D.random(), 0))
+const lightOffsets = Array.from({ length: 10 }, () => Vector3DScalar.multiply(Direction3D.random(), 1))
 
 export function trace(world, ray, type, depth, debug) {
 	if(debug) { console.log(depth, type, ray) }
@@ -104,7 +105,7 @@ export function trace(world, ray, type, depth, debug) {
 
 			const shadowPercent = shadowSet.reduce((acc, hasShadow) => acc + (hasShadow ? 1 : 0), 0) / shadowSet.length
 
-			if(debug) { console.log('shaodow percent', shadowSet, shadowPercent) }
+			if(debug) { console.log('shadow percent', shadowSet, shadowPercent) }
 
 			return {
 				...light,
@@ -114,26 +115,37 @@ export function trace(world, ray, type, depth, debug) {
 			}
 		})
 
-		const [ firstLightInfo ] = lightingInfo
+		const lightColors = Color.mix(...lightingInfo.map(info => Shader.phong(intersection, info, debug)))
 
-		if((refractionColor === undefined) && (reflectionColor === undefined)) {
-			return Shader.phong(intersection, firstLightInfo, debug)
-		}
+		// return Color.mix(lightColors)
+		const index = .7
+		return Color.mix(
+			Color.multiply(lightColors, 2),
+			Color.sum(
+				Color.multiply(refractionColor, index),
+				Color.multiply(reflectionColor, 1 - index)))
+		// return Color.mix(lightColors, refractionColor, reflectionColor)
 
-		if((reflectionColor === undefined) && (refractionColor !== undefined)) {
-			// firstLightInfo.inShadow = false
-			const shaderColor = Shader.phong(intersection, firstLightInfo, debug)
-			return `color-mix(in lab, ${shaderColor} 50%, ${refractionColor})`
-		}
+		// const [ firstLightInfo ] = lightingInfo
 
-		if((reflectionColor !== undefined) && (refractionColor === undefined)) {
-			const shaderColor = Shader.phong(intersection, firstLightInfo, debug)
-			return `color-mix(in lab, ${shaderColor} 70%, ${reflectionColor})`
-		}
+		// if((refractionColor === undefined) && (reflectionColor === undefined)) {
+		// 	return Shader.phong(intersection, firstLightInfo, debug)
+		// }
 
-		const shaderColor = Shader.phong(intersection, firstLightInfo, debug)
-		return `color-mix(in lab, color-mix(in lab, ${refractionColor}, ${reflectionColor} 20%), ${shaderColor} 20%)`
+		// if((reflectionColor === undefined) && (refractionColor !== undefined)) {
+		// 	// firstLightInfo.inShadow = false
+		// 	const shaderColor = Shader.phong(intersection, firstLightInfo, debug)
+		// 	return `color-mix(in lab, ${shaderColor} 50%, ${refractionColor})`
+		// }
+
+		// if((reflectionColor !== undefined) && (refractionColor === undefined)) {
+		// 	const shaderColor = Shader.phong(intersection, firstLightInfo, debug)
+		// 	return `color-mix(in lab, ${shaderColor} 70%, ${reflectionColor})`
+		// }
+
+		// const shaderColor = Shader.phong(intersection, firstLightInfo, debug)
+		// return `color-mix(in lab, color-mix(in lab, ${refractionColor}, ${reflectionColor} 20%), ${shaderColor} 20%)`
 	}
 
-	return 'lightblue'
+	return Color.from('lightblue')
 }

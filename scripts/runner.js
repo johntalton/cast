@@ -1,3 +1,4 @@
+import { Color } from './lib/color.js'
 import { Direction3D, Ray3D, Vector2D, Vector3D, Vector3DScalar } from './lib/maths.js'
 import { trace } from './lib/trace.js'
 
@@ -57,7 +58,7 @@ export function* cast(world, width, height, camera, minW, maxW, minH, maxH) {
 	const start = performance.now()
 	const depth = DEPTH
 
-	const offsets = Array.from({ length: 0 }, () => Vector3DScalar.multiply(Direction3D.random(), 1))
+	const offsets = Array.from({ length: 0 }, () => Vector3DScalar.multiply(Direction3D.random(), 5))
 
 	for(let h = minH; h < maxH; h += 1) {
 		for(let w = minW; w < maxW; w += 1) {
@@ -73,9 +74,10 @@ export function* cast(world, width, height, camera, minW, maxW, minH, maxH) {
 			const r = new Ray3D(viewportOrigin, Direction3D.from(viewportOrigin, viewportFocus))
 			const baseColor = trace(world, r, 'EYE', depth, false)
 
-			const color = colors.reduce((acc, color) => {
-				return `color-mix(in lab, ${acc}, ${color})`
-			}, baseColor)
+			// const color = colors.reduce((acc, color) => {
+			// 	return `color-mix(in lab, ${acc}, ${color})`
+			// }, baseColor)
+			const color = Color.mix(baseColor, ...colors)
 
 			yield { x: w, y: h, color }
 		}
