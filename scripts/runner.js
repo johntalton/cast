@@ -55,7 +55,7 @@ export function castOne(world, width, height, camera, x, y) {
 }
 
 export function* cast(world, width, height, camera, minW, maxW, minH, maxH) {
-	const start = performance.now()
+	// const start = performance.now()
 	const depth = DEPTH
 
 	const offsets = Array.from({ length: 0 }, () => Vector3DScalar.multiply(Direction3D.random(), 5))
@@ -83,6 +83,6 @@ export function* cast(world, width, height, camera, minW, maxW, minH, maxH) {
 		}
 	}
 
-	const diff = performance.now() - start
-	console.log(`finished in ${diff} ms`)
+	// const diff = performance.now() - start
+	// console.log(`finished in ${diff} ms`)
 }

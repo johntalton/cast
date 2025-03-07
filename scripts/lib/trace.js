@@ -10,7 +10,7 @@ const FEATURES = {
 	REFRACTION: true
 }
 
-const lightOffsets = Array.from({ length: 10 }, () => Vector3DScalar.multiply(Direction3D.random(), 1))
+const lightOffsets = Array.from({ length: 1 }, () => Vector3DScalar.multiply(Direction3D.random(), 0))
 
 export function trace(world, ray, type, depth, debug) {
 	if(debug) { console.log(depth, type, ray) }
