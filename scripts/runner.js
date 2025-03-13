@@ -2,7 +2,7 @@ import { Color } from './lib/color.js'
 import { Direction3D, Ray3D, Vector2D, Vector3D, Vector3DScalar } from './lib/maths.js'
 import { trace } from './lib/trace.js'
 
-const DEPTH = 10
+const DEPTH = 5
 
 function canvasToCameraViewport(camera, canvasX, canvasY, canvasWidth, canvasHeight, debug) {
 

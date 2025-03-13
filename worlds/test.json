@@ -1,0 +1,84 @@
+{
+	"views": [
+    {
+			"origin": { "x": -1, "y": 3, "z": -1 },
+			"lookAt": { "x": 0, "y": 0, "z": 1 },
+      "normal": { "x": 0, "y": 1, "z": 0 },
+      "fov": 20,
+			"focalDistance": 2,
+			"viewportWidth": 4, "viewportHeight": 3
+		}
+  ],
+	"objects": [
+    {
+      "name": "Ground",
+      "type": "sphere",
+      "center": { "x": 0, "y": -100.5, "z": 1 },
+      "radius": 100,
+      "material": {
+        "color": { "r": 204, "g": 204, "b": 0 }
+      }
+    },
+    {
+      "name": "Center",
+      "type": "sphere",
+      "center": { "x": 0, "y": 0, "z": 1.2 },
+      "radius": 0.5,
+      "material": {
+        "color": { "r": 25, "g": 51, "b": 127 },
+        "specular": 0.5,
+				"diffuse": 0.5,
+				"gloss": 1
+      }
+    },
+    {
+      "name": "Left",
+      "type": "sphere",
+      "center": { "x": -1, "y": 0, "z": 1 },
+      "radius": 0.5,
+      "material": {
+        "color": "white",
+        "refraction": 1.4,
+				"reflection": true,
+				"specular": 1,
+				"diffuse": 0.0001,
+				"gloss": 100
+      }
+    },
+    {
+      "name": "Bubble",
+      "type": "sphere",
+      "center": { "x": -1, "y": 0, "z": 1 },
+      "radius": 0.4,
+      "material": {
+        "color": "white",
+	  		"reflection": true,
+        "specular": 1,
+        "diffuse": 0.0001,
+				"gloss": 100
+      }
+    },
+
+
+    {
+      "name": "Right",
+      "type": "sphere",
+      "center": { "x": 1, "y": 0, "z": 1 },
+      "radius": 0.5,
+      "material": {
+        "color": { "r": 204, "g": 153, "b": 51 },
+        "reflection": false
+      }
+    }
+
+
+	],
+	"lights": [
+    {
+      "type": "point",
+      "center": { "x": 0, "y": 100, "z": -100 },
+      "intensity": 1,
+      "color": "white"
+    }
+  ]
+}

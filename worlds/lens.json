@@ -32,8 +32,8 @@
 				"refraction": 1.5,
 				"reflection": true,
 				"specular": 1,
-				"diffuse": 10,
-				"gloss": 100,
+				"diffuse": 0.001,
+				"gloss": 1000,
 				"color": "lightblue"
 			}
 		},
@@ -56,7 +56,7 @@
       "type": "point",
       "center": { "x": 75, "y": 200, "z": -100 },
       "color": "white",
-			"intensity": 100
+			"intensity": 10
     }
   ]
 }

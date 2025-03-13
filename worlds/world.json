@@ -16,14 +16,24 @@
 			"type": "cube",
 			"center": { "x": -10, "y": 15, "z": -155 },
 			"width": 70, "height": 30, "depth": 10,
-			"material": { "color": "orchid" }
+			"material": {
+				"color": "orchid",
+				"specular": 0.02,
+				"diffuse": 1,
+				"reflection": true,
+				"refraction": 1.2
+			}
 		},
 		{
 			"name": "B-cube",
 			"type": "cube",
 			"center": { "x": 50, "y": 30, "z": -60 },
 			"width": 20, "height": 120, "depth": 20,
-			"material": { "color": "purple" }
+			"material": {
+				"color": "purple",
+				"diffuse": 0.5,
+				"specular": 1
+			}
 		},
 		{
 			"name": "A-sphere",
@@ -66,10 +76,75 @@
 			"center": { "x": -80, "y": 30, "z": -40 },
 			"radius": 20,
 			"material": {
-				"width": 10, "height": 10,
+				"reflection": true,
 				"color": [ "lime", "palegreen" ]
 			}
 		},
+
+
+		{
+			"name": "A-Cylinder",
+			"type": "cylinder",
+			"center": { "x": 0, "y": 20, "z": -200 },
+			"radius": 10,
+			"transform": [
+				{ "rotateY": 90 },
+				{ "rotateZ": -45 }
+			],
+			"material": {
+				"color": "wheat",
+				"specular": 5,
+				"gloss": 5,
+				"diffuse": 0.125
+			}
+		},
+
+		{
+			"name": "A-CSG",
+			"type": "csg",
+			"operation": "intersection",
+			"center": { "x": 0, "y": 0, "z": 0 },
+			"objects": [
+				{
+					"type": "cube",
+					"center": { "x": 0, "y": 0, "z": -250 },
+					"width": 40,
+					"height": 40,
+					"depth": 100
+				},
+				{
+					"type": "cylinder",
+					"center": { "x": 0, "y": 0, "z": 0 },
+					"radius": 10
+				}
+			],
+			"material": {
+				"color": "lime",
+				"specular": 1,
+				"gloss": 2,
+				"diffuse": 0.125
+			}
+		},
+
+
+
+		{
+			"name": "A-cone",
+			"type": "cone",
+			"center": { "x": -100, "y": -50, "z": -100 },
+			"orientation": { "x": 0, "y": -1, "z": 0 },
+			"angle": 1.5,
+			"material": {
+				"color": "cyan",
+				"reflection": true,
+				"refraction": 1.2,
+				"specular": 1,
+				"gloss": 2,
+				"diffuse": 0.125
+			}
+		},
+
+
 		{
 			"name": "A-plane",
 			"type": "plane",
@@ -81,6 +156,8 @@
 				"color": [ "pink", "white" ]
 			}
 		},
+
+
 		{
 			"name": "B-plane",
 			"type": "plane",
@@ -103,9 +180,15 @@
 	"lights": [
     {
       "type": "point",
-      "center": { "x": -300, "y": 300, "z": -500 },
-      "color": "pink",
-			"intensity": 1
+      "center": { "x": -0, "y": 100, "z": -400 },
+      "color": "white",
+			"intensity": 5
+    },
+		{
+      "type": "point",
+      "center": { "x": -300, "y": 0, "z": -200 },
+      "color": "white",
+			"intensity": 5
     }
   ]
 }

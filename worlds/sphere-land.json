@@ -1,0 +1,381 @@
+{
+	"views": [
+		{
+			"name": "front",
+			"origin": { "x": 0, "y": 0, "z": -100 },
+			"lookAt": { "x": 0, "y": -15, "z": 0 },
+			"fov": 30,
+			"focalDistance": 800,
+			"viewportWidth": 200, "viewportHeight": 150
+		}
+
+	],
+	"objects": [
+		{
+			"type": "sphere",
+			"center": { "x": 0, "y": -60, "z": 50 },
+			"radius": 40,
+			"material": {
+				"color": "green"
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": 70, "y": -70, "z": 110 },
+			"radius": 30,
+			"material": {
+				"color": "red",
+				"refraction": 1.9,
+				"reflection": true,
+				"specular": 5,
+				"gloss": 200
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": -50, "y": -70, "z": -10 },
+			"radius": 30,
+			"material": {
+				"color": "blue",
+        "specular": 0.15,
+        "gloss": 10
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": 120, "y": -80, "z": 60 },
+			"radius": 20,
+			"material": {
+				"color": "purple",
+				"refraction": 1.9,
+				"reflection": true,
+				"specular": 15,
+				"diffuse": 0.05,
+				"gloss": 100
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": -80, "y": -70, "z": 100 },
+			"radius": 30,
+			"material": {
+				"color": "orange",
+				"refraction": 1.9,
+				"reflection": true,
+				"specular": 15,
+				"diffuse": 0.05,
+				"gloss": 100
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": 50, "y": -60, "z": 200 },
+			"radius": 40,
+			"material": {
+				"color": "azure",
+				"reflection": true,
+				"specular": 1,
+				"diffuse": 5,
+				"gloss": 100
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": 80, "y": -90, "z": 50 },
+			"radius": 10,
+			"material": {
+				"color": "firebrick",
+				"refraction": 1.9,
+				"reflection": true,
+				"specular": 15,
+				"diffuse": 0.05,
+				"gloss": 100
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": -100, "y": -75, "z": 50 },
+			"radius": 25,
+			"material": {
+				"color": "indigo",
+				"refraction": 1.9,
+				"reflection": true,
+				"specular": 15,
+				"diffuse": 0.05,
+				"gloss": 100
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": -50, "y": -75, "z": 170 },
+			"radius": 25,
+			"material": {
+				"color": "lavenderblush",
+				"refraction": 1.9,
+				"reflection": true,
+				"specular": 15,
+				"diffuse": 0.05,
+				"gloss": 100
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": 50, "y": -80, "z": -25 },
+			"radius": 20,
+			"material": {
+				"color": "lime",
+				"refraction": 1.9,
+				"reflection": true,
+				"specular": 15,
+				"diffuse": 0.05,
+				"gloss": 100
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": 200, "y": -50, "z": 350 },
+			"radius": 50,
+			"material": {
+				"color": "navy"
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": 50, "y": -60, "z": 400 },
+			"radius": 40,
+			"material": {
+				"color": "olive",
+				"refraction": 1.9,
+				"reflection": false,
+				"specular": 15,
+				"diffuse": 0.05,
+				"gloss": 100
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": -150, "y": -80, "z": 400 },
+			"radius": 20,
+			"material": {
+				"color": "orchid",
+				"refraction": 1.9,
+				"reflection": true,
+				"specular": 15,
+				"diffuse": 0.05,
+				"gloss": 100
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": -50, "y": -70, "z": 400 },
+			"radius": 30,
+			"material": {
+				"color": "palegreen",
+				"refraction": 1.9,
+				"reflection": true,
+				"specular": 15,
+				"diffuse": 0.05,
+				"gloss": 100
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": -200, "y": -50, "z": 450 },
+			"radius": 50,
+			"material": {
+				"color": "plum"
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": 90, "y": -50, "z": 600 },
+			"radius": 50,
+			"material": {
+				"color": "rebeccapurple",
+				"reflection": true,
+				"specular": 5,
+				"diffuse": 0.5,
+				"gloss": 100
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": -100, "y": -55, "z": 620 },
+			"radius": 45,
+			"material": {
+				"color": "seagreen",
+				"specular": 15,
+				"diffuse": 5,
+				"gloss": 1000
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": 0, "y": 0, "z": 800 },
+			"radius": 100,
+			"material": {
+				"color": "white",
+				"refraction": 1.9,
+				"reflection": true,
+				"specular": 15,
+				"diffuse": 0.05,
+				"gloss": 100
+			}
+		},
+
+
+
+
+
+
+
+
+    {
+			"type": "sphere",
+			"center": { "x": 200, "y": -50, "z": 500 },
+			"radius": 50,
+			"material": {
+				"color": "snow"
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": 150, "y": -60, "z": 650 },
+			"radius": 40,
+			"material": {
+				"color": "slateblue"
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": -200, "y": -70, "z": 700 },
+			"radius": 30,
+			"material": {
+				"color": "steelblue",
+        "reflection": true
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": -200, "y": -50, "z": 1000 },
+			"radius": 50,
+			"material": {
+				"color": "tomato",
+        "diffuse": 0.125
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": 220, "y": -50, "z": 1200 },
+			"radius": 50,
+			"material": {
+				"color": "violet",
+        "reflection": 1.5
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": -20, "y": -80, "z": 700 },
+			"radius": 20,
+			"material": {
+				"color": "yellowgreen"
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": -400, "y": -60, "z": 1600 },
+			"radius": 40,
+			"material": {
+				"color": "chartreuse",
+        "reflection": true,
+        "refraction": 1.5,
+        "specular": 1.5,
+        "gloss": 100
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": 400, "y": -50, "z": 1900 },
+			"radius": 50,
+			"material": {
+				"color": "cornsilk",
+        "diffuse": 0.1
+			}
+		},
+    {
+			"type": "sphere",
+			"center": { "x": -200, "y": -60, "z": 2000 },
+			"radius": 40,
+			"material": {
+				"color": "darkgoldenrod",
+        "specular": 2,
+        "gloss": 100,
+        "reflection": true
+			}
+		},
+
+
+
+
+
+
+
+
+
+
+    {
+			"name": "Floor",
+			"type": "plane",
+			"center": { "x": 0, "y": -100, "z": 0 },
+			"normal": { "x": 0, "y": 1, "z": 0 },
+			"material": {
+        "type": "checker",
+        "color": [ "red", "yellow" ],
+        "width": 100, "height": 100,
+				"reflection": false,
+				"specular": 5,
+				"diffuse": 0.5,
+				"gloss": 100
+			}
+		},
+    {
+			"name": "back",
+			"type": "plane",
+			"center": { "x": 0, "y": 0, "z": 3000 },
+			"normal": { "x": 0, "y": 0, "z": -1 },
+			"material": {
+        "color": "lightblue",
+				"reflection": false,
+				"specular": 15,
+				"diffuse": 1,
+				"gloss": 50
+			}
+		}
+	],
+	"lights": [
+		{
+			"type": "point",
+			"center": { "x": 100, "y": 300, "z": 300 },
+			"color": "lemonchiffon",
+			"intensity": 10
+		},
+		{
+			"type": "point",
+			"center": { "x": -300, "y": 500, "z": -200 },
+			"color": "lightblue",
+			"intensity": 20
+		},
+    {
+			"type": "point",
+			"center": { "x": -320, "y": 500, "z": -210 },
+			"color": "lightblue",
+			"intensity": 20
+		},
+    {
+			"type": "point",
+			"center": { "x": -350, "y": 505, "z": -220 },
+			"color": "lightblue",
+			"intensity": 20
+		}
+	]
+}

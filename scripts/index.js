@@ -25,6 +25,7 @@ function initCanvas(canvas, world, camera) {
 	const offscreenCanvas = canvas.transferControlToOffscreen()
 
 	worker.postMessage({
+		// type: 'cast',
 		type: 'pool-cast',
 		canvas: offscreenCanvas,
 		world,
@@ -34,6 +35,8 @@ function initCanvas(canvas, world, camera) {
 	}, {
 		transfer: [ offscreenCanvas ]
 	})
+
+	return worker
 }
 
 function loadWorld(worldSrc) {

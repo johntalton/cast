@@ -1,0 +1,71 @@
+{
+	"views": [
+		{
+			"name": "front",
+			"origin": { "x": 0, "y": 0, "z": -100 },
+			"lookAt": { "x": 0, "y": 0, "z": 0 },
+			"fov": 30,
+			"focalDistance": 800,
+			"viewportWidth": 200, "viewportHeight": 150
+		}
+
+	],
+	"objects": [
+		{
+			"type": "cube",
+			"center": { "x": -50, "y": -30, "z": 0 },
+			"width": 60,
+			"depth": 60,
+			"height": 60,
+			"transform": [
+				{ "rotateY": 45 },
+				{ "rotateX": 30 }
+			],
+			"material": {
+				"type": "checker",
+				"color": [ "green", "white" ]
+			}
+		},
+
+
+		{
+			"type": "cube",
+			"center": { "x": 50, "y": -30, "z": 0 },
+			"width": 60,
+			"depth": 60,
+			"height": 60,
+			"transform": [
+				{ "rotateX": 30 },
+				{ "rotateY": 45 }
+			],
+			"material": {
+				"type": "checker",
+				"color": [ "blue", "white" ]
+			}
+		},
+
+
+		{
+			"name": "Floor",
+			"type": "plane",
+			"center": { "x": 0, "y": -101, "z": 0 },
+			"normal": { "x": 0, "y": 1, "z": 0 },
+			"material": {
+        "color": "white",
+				"reflection": false,
+				"specular": 5,
+				"diffuse": 0.5,
+				"gloss": 100
+			}
+		}
+
+	],
+	"lights": [
+		{
+			"type": "point",
+			"center": { "x": 200, "y": 80, "z": -200 },
+			"color": "white",
+			"intensity": 10
+		}
+  ]
+}

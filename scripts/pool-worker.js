@@ -28,8 +28,6 @@ function handleChunk(data) {
 			const length = chunk.width * chunk.height * 4
 			const imageData = new Uint8ClampedArray(length)
 
-			imageData[0] = 69
-
 			for(const { x, y, color } of cast(config.world, config.width, config.height, config.camera, chunk.x, chunk.x + chunk.width, chunk.y, chunk.y + chunk.height)) {
 				// console.log(chunk, x, y)
 				const index = ((y - chunk.y) * chunk.width + (x - chunk.x)) * 4

@@ -45,15 +45,14 @@ export async function textureMapper(options) {
 			const r = data[index + 0]
 			const g = data[index + 1]
 			const b = data[index + 2]
-			const a = data[index + 3] / 255
+			// const a = data[index + 3]
 
-			// return `rgba(${r} ${g} ${b} / ${a})`
 			return { r, g, b }
 		}
 	}
 
 	const _url = new URL(url, self.location.href)
-	const response = await fetch(_url, { mode: 'cors' })
+	const response = await fetch(_url, { mode:'no-cors'})
 	if(!response.ok) {
 		// console.log(response)
 		throw new Error(`failed to fetch image url ${_url}`)

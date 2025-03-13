@@ -28,7 +28,7 @@ export class World {
 
 		const material = await World.futureMaterial(options.material)
 
-		const withMaterial = o => ({ material: material, ...o })
+		const withMaterial = o => ({ ...o, material: { ...material, ...o.material } })
 		const objects = options.objects ? await Promise.all(options.objects?.map(withMaterial).map(World.futureObject)) : undefined
 
 		return new maker({

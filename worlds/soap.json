@@ -1,0 +1,72 @@
+{
+	"views": [
+    {
+			"origin": { "x": 0, "y": 1.25, "z": -0.75 },
+			"lookAt": { "x": 0, "y": 1, "z": 0 },
+      "fov": 60,
+			"focalDistance": 2,
+			"viewportWidth": 2, "viewportHeight": 1.5
+		}
+  ],
+	"objects": [
+    {
+      "name": "Bubble",
+      "type": "CSG",
+      "operation": "difference",
+      "objects": [
+        {
+          "type": "sphere",
+          "center": { "x": 0, "y": 1, "z": -0.125 },
+          "radius": 0.5,
+          "material": { "color": "purple" }
+        },
+        {
+          "type": "sphere",
+          "center": { "x": 0, "y": 1, "z": -0.125 },
+          "radius": 0.36,
+          "material": {
+            "_type": "texture",
+            "url": "../textures/petrol_rainbow.jpg"
+          }
+        }
+      ],
+      "material": {
+        "color": "white",
+        "reflection": true,
+        "refraction": 1.1,
+        "specular": 0.5,
+        "gloss": 1500
+      }
+    },
+
+
+    {
+      "type": "cube",
+      "center": { "x": 0, "y": -0.5, "z": 0 },
+      "height": 2,
+      "width": 2,
+      "depth": 2,
+      "material": {
+        "type": "checker",
+        "color": [ "white", "grey" ],
+        "width": 0.286,
+        "height": 0.286
+      }
+    }
+
+	],
+	"lights": [
+    {
+      "type": "point",
+      "center": { "x": 10, "y": 10, "z": 10 },
+      "intensity": 2,
+      "color": "white"
+    },
+    {
+      "type": "point",
+      "center": { "x": 10, "y": 10, "z": 12 },
+      "intensity": 2,
+      "color": "blue"
+    }
+  ]
+}

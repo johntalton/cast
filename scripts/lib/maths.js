@@ -5,6 +5,9 @@
  * @property {number} z
  */
 
+export function degreeToRadian(degree) {
+	return degree * Math.PI / 180
+}
 
 export class Vector3DScalar {
 	/**
@@ -221,6 +224,14 @@ export class Vector3D {
 
 export class Matrix3x3 {
 
+	static identity() {
+		return [
+			[ 1, 0, 0 ],
+			[ 0, 1, 0 ],
+			[ 0, 0, 1 ]
+		]
+	}
+
 	static alignment(v1, target) {
 		// https://gist.github.com/kevinmoran/b45980723e53edeb8a5a43c49f134724
 		const axis = Vector3D.crossProduct(target, v1) // swapped
@@ -304,6 +315,23 @@ export class Matrix3x3 {
 			z: v.x * matrix[0][2] + v.y * matrix[1][2] + v.z * matrix[2][2],
 		}
 	}
+
+	static multiplyMatrix(a, b) {
+		const Ar0 = a[0]
+		const Ar1 = a[1]
+		const Ar2 = a[2]
+		const Bc0 = [ b[0][0], b[1][0], b[2][0] ]
+		const Bc1 = [ b[0][1], b[1][1], b[2][1] ]
+		const Bc2 = [ b[0][2], b[1][2], b[2][2] ]
+
+		const dot = (r, c) => (r[0] * c[0]) + (r[1] * c[1]) + (r[2] * c[2])
+
+		return [
+			[ dot(Ar0, Bc0), dot(Ar0, Bc1), dot(Ar0, Bc2) ],
+			[ dot(Ar1, Bc0), dot(Ar1, Bc1), dot(Ar1, Bc2) ],
+			[ dot(Ar2, Bc0), dot(Ar2, Bc1), dot(Ar2, Bc2) ]
+		]
+	}
 }
 
 export class Direction3D {
@@ -332,8 +360,16 @@ export class Direction3D {
 
 		const direction = Direction3D.from(origin, at)
 
+		if(overrideNormal !== undefined) {
+			return {
+				direction,
+				normal: new Direction3D(overrideNormal)
+			}
+		}
+
 		const rotation = Matrix3x3.alignment(initialDirection, direction)
 		const normal = Vector3D.normalized(Matrix3x3.multiply(rotation, initialNormal))
+
 
 		return { direction, normal }
 	}
@@ -373,9 +409,6 @@ export class Direction3D {
 	toString() { return `{ x: ${this.x}, y: ${this.y}, z: ${this.z} }` }
 }
 
-export class Transform3D {
-
-}
 
 export class Ray3D {
 	#origin

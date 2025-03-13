@@ -3,5 +3,7 @@ node_modules/
 test/
 images/
 
+.clinic/
+
 package-lock.json
 .DS_Store

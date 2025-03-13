@@ -1,16 +1,14 @@
 import { Color } from './color.js'
-import { Direction3D, Intersection3D, Matrix3x3, Ray3D, Vector3D, Vector3DScalar } from './maths.js'
+import { degreeToRadian, Direction3D, Intersection3D, Matrix3x3, Ray3D, Vector3D, Vector3DScalar } from './maths.js'
 
 export class Object3D {
 	#name
 	#material
-	#transform
 
 	constructor(options) {
-		const { name, material, transform } = options
+		const { name, material } = options
 		this.#name = name
 		this.#material = material ?? { color: Color.from('red') }
-		this.#transform = transform
 	}
 
 	get name() { return this.#name }
@@ -34,27 +32,88 @@ export class Object3D {
 		return this.material.color
 	}
 
-	toLocal(ray) {
-		return ray
-		// if(this.#transform === undefined || this.#transform?.length <= 0) { return ray }
-		// const rotateY = Matrix3x3.rotateZ(- Math.PI / 8)
-		// return new Ray3D(Matrix3x3.multiply(rotateY, ray.origin), Matrix3x3.multiply(rotateY, ray.direction))
+	/**
+	 * @param {Ray3D} ray
+	 * @returns {Array<Intersection3D>}
+	 */
+	intersections(ray) { return [] }
+}
+
+export class TransformObject3D extends Object3D {
+	#transform
+	#matrix
+	#center
+
+	static buildMatrix(transforms) {
+		return transforms.map(transform => {
+			const [ kvp ] = Object.entries(transform)
+			const [ key, degreeValue ] = kvp
+			const value = degreeToRadian(degreeValue)
+
+			switch(key) {
+				case 'rotateX':
+					return Matrix3x3.rotateX(-value)
+				break
+				case 'rotateY':
+					return Matrix3x3.rotateY(-value)
+				break
+				case 'rotateZ':
+					return Matrix3x3.rotateZ(-value)
+				break
+				default:
+					throw new Error(`unknown transformation ${key}`)
+			}
+		})
+		// .reverse()
+		.reduce((acc, matrix) => Matrix3x3.multiplyMatrix(matrix, acc), Matrix3x3.identity())
 	}
+
+	constructor(options) {
+		super(options)
+
+		const { center, transform } = options
+		this.#center = center
+		this.#transform = transform ?? []
+
+		this.#matrix = TransformObject3D.buildMatrix(this.#transform)
+	}
+
+	normalAt(point) {
+		const localPoint = Matrix3x3.multiply(this.#matrix, Vector3D.subtract(point, this.#center))
+		return this.localNormalAt(localPoint)
+	}
+
+	uvAt(point) {
+		const localPoint = Matrix3x3.multiply(this.#matrix, Vector3D.subtract(point, this.#center))
+		return this.localUVAt(localPoint)
+	}
+
+	intersections(ray, debug) {
+		const localRay = new Ray3D(Matrix3x3.multiply(this.#matrix, Vector3D.subtract(ray.origin, this.#center)), Matrix3x3.multiply(this.#matrix, ray.direction))
+		return this.localIntersections(ray, localRay, debug)
+	}
+
+	/**
+	 *
+	 */
+	localNormalAt(point) { return super.normalAt(point) }
+
+	/**
+	 *
+	 */
+	localUVAt(point) { return super.uvAt(point) }
+
+	/**
+	 *
+	 */
+	localColorAt(point) { return super.colorAt(point) }
 
 	/**
 	 * @param {Ray3D} globalRay
 	 * @param {Ray3D} localRay
 	 * @returns {Array<Intersection3D>}
 	 */
-	localIntersections(globalRay, localRay) {
-		return []
-	}
-
-	/**
-	 * @param {Ray3D} ray
-	 * @returns {Array<Intersection3D>}
-	 */
-	intersections(ray) { return this.localIntersections(ray, this.toLocal(ray)) }
+	localIntersections(globalRay, localRay) { return [] }
 }
 
 export class QuadraticObject3D extends Object3D {
@@ -89,6 +148,42 @@ export class QuadraticObject3D extends Object3D {
 		return [
 			new Intersection3D(ray, t1, this, enterFirst),
 			new Intersection3D(ray, t2, this, !enterFirst)
+		]
+	}
+}
+
+export class TransformQuadraticObject3D extends TransformObject3D {
+	constructor(options) {
+		super(options)
+	}
+
+	localQuadratic(ray, debug) {
+		return { a: 0, b: 0, c: 0 }
+	}
+
+	localIntersections(globalRay, ray, debug) {
+		const { a, b, c } = this.localQuadratic(ray, debug)
+
+		// quadratic
+		const discriminate = (b * b) - (4.0 * a * c)
+		if (discriminate < 0) { return [] }
+
+		if (discriminate === 0) {
+			const t = -b / (2 * a)
+			return [ new Intersection3D(globalRay, t, this, false) ]
+		}
+
+		const sqrtDiscriminate = Math.sqrt(discriminate)
+
+		const t1 = (-b - sqrtDiscriminate) / (2.0 * a)
+		const t2 = (-b + sqrtDiscriminate) / (2.0 * a)
+
+		// console.log(t1, t2)
+		const enterFirst = t1 < t2
+
+		return [
+			new Intersection3D(globalRay, t1, this, enterFirst),
+			new Intersection3D(globalRay, t2, this, !enterFirst)
 		]
 	}
 }
@@ -172,12 +267,7 @@ export class Sphere extends QuadraticObject3D {
 	}
 }
 
-export class Cube extends Object3D {
-	#center
-	#width
-	#height
-	#depth
-
+export class Cube extends TransformObject3D {
 	#min
 	#max
 	#d
@@ -185,34 +275,27 @@ export class Cube extends Object3D {
 	constructor(options) {
 		super(options)
 
-		const { center, width, height, depth } = options
-
-		this.#center = center
-		this.#width = width
-		this.#height = height
-		this.#depth = depth
-
+		const { width, height, depth } = options
 		const dim = {
 			x: width / 2,
 			y: height / 2,
 			z: depth / 2
 		}
+
+		const center = { x: 0, y: 0, z: 0 }
 		this.#min = Vector3D.subtract(center, dim)
 		this.#max = Vector3D.add(center, dim)
 		this.#d = Vector3DScalar.divide(Vector3D.subtract(this.#min, this.#max), 2)
 	}
 
-	uvAt(point) {
-		const normalPoint = Vector3D.subtract(point, this.#center)
-		const rotation = Matrix3x3.alignment(this.normalAt(point), new Direction3D({ x: 0, y: 0, z: -1 }))
-		const { x: u, y: v } = Matrix3x3.multiply(rotation, normalPoint)
+	localUVAt(point) {
+		const rotation = Matrix3x3.alignment(this.localNormalAt(point), new Direction3D({ x: 0, y: 0, z: -1 }))
+		const { x: u, y: v } = Matrix3x3.multiply(rotation, point)
 		return { u, v }
 	}
 
-	normalAt(point) {
-		const p = Vector3D.subtract(point, this.#center)
-		const n = Vector3D.trunc(Vector3DScalar.multiply(Vector3D.divide(p, Vector3D.abs(this.#d)), 1.0001))
-
+	localNormalAt(point) {
+		const n = Vector3D.trunc(Vector3DScalar.multiply(Vector3D.divide(point, Vector3D.abs(this.#d)), 1.0001))
 		return new Direction3D(n)
 	}
 
@@ -239,23 +322,21 @@ export class Cube extends Object3D {
 	}
 }
 
-export class Cylinder extends QuadraticObject3D {
-	#center
+export class Cylinder extends TransformQuadraticObject3D {
 	#radius
 
 	constructor(options) {
 		super(options)
 
-		const { center, radius } = options
+		const { radius } = options
 
-		this.#center = center
 		this.#radius = radius
 	}
 
-	uvAt(point) {
+	localUVAt(point) {
 		const offset = 0 //Math.PI
 
-		const po = Vector3D.subtract(point, this.#center)
+		const po = point
 		const p = new Direction3D({ x: po.x, y: po.y, z: 0 })
 		const angle = Math.acos(Vector3D.dotProduct(p, { x: 0, y: -1, z: 0}))
 		return {
@@ -266,8 +347,8 @@ export class Cylinder extends QuadraticObject3D {
 		}
 	}
 
-	normalAt(point) {
-		const po = Vector3D.subtract(point, this.#center)
+	localNormalAt(point) {
+		const po = point
 		const p = new Direction3D({ x: po.x, y: po.y, z: 0 })
 		const angle = Math.acos(Vector3D.dotProduct(p, { x: 0, y: -1, z: 0}))
 		const d = {
@@ -279,15 +360,13 @@ export class Cylinder extends QuadraticObject3D {
 		return new Direction3D(d)
 	}
 
-	quadratic(ray) {
+	localQuadratic(ray) {
 		// x^2 + y^2 = r^2
-		const C = Vector3D.subtract(ray.origin, this.#center)
+		const C = ray.origin
 
 		const a = ray.direction.x * ray.direction.x + ray.direction.y * ray.direction.y
 		const b = (2 * C.x * ray.direction.x) + (2 * C.y * ray.direction.y)
 		const c = (C.x * C.x) + (C.y * C.y) - (this.#radius * this.#radius)
-
-
 
 		return { a, b, c }
 	}

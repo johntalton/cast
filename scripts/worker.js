@@ -11,7 +11,7 @@ const config = {
 const poolQueue = new Array()
 
 function* chunks(config) {
-	const chunkHeight = 20
+	const chunkHeight = 1
 	for(let y = 0; y < config.height; y += chunkHeight) {
 		yield {
 			x: 0,
@@ -23,7 +23,7 @@ function* chunks(config) {
 }
 
 function initPool(handleChunkFn) {
-	const poolWorkers = [ 1, 2, 3, 4 ]
+	const poolWorkers = [ 1, 2, 3, 4, 5, 6, 7, 8 ]
 
 	return poolWorkers.map(id => {
 		// console.log('making pool worker', id)
@@ -37,7 +37,11 @@ function initPool(handleChunkFn) {
 				case 'request-chunk':{
 					// console.log('pool worker requested chunk', id)
 					const chunk = poolQueue.shift()
-					if(chunk === undefined) { return }
+					if(chunk === undefined) {
+						// console.log('no more work queued')
+						poolWorker.terminate()
+						return
+					}
 					poolWorker.postMessage({
 						type: 'chunk',
 						chunk
@@ -59,12 +63,11 @@ function initPool(handleChunkFn) {
 	})
 }
 
-
 function handlePoolCast(data) {
 	const { canvas, world, camera } = data
 
 	const context = canvas.getContext('2d', {
-		alpha: false,
+		alpha: true,
 		colorSpace: 'display-p3'
 	})
 	if(context === null) { throw new Error('failed to create canvas context') }
@@ -96,7 +99,9 @@ function handlePoolCast(data) {
 		height: canvas.height
 	}
 
-	poolQueue.push(...chunks(chunkConfig))
+	// poolQueue.push(...chunks(chunkConfig))
+	const orderedChunks = [ ...chunks(chunkConfig) ]
+	poolQueue.push(...orderedChunks.sort((a, b) => 0.5 - Math.random()))
 
 	// console.log(poolQueue)
 }
@@ -120,12 +125,13 @@ function handleCast(data) {
 			config.height = canvas.height
 			config.camera = await World.futureView(camera)
 
-			console.log(realWorld)
+			// console.log(realWorld)
 
 			for(const { x, y, color } of cast(config.world, config.width, config.height, config.camera, 0, config.width, 0, config.height)) {
 				// context.fillStyle = color
 				// context.fillRect(x, y, 1, 1)
 				const index = (y * config.width + x) * 4
+
 				// imageData.data[index] =  Math.random() * 255
 				// imageData.data[index + 1] = Math.random() * 255
 				// imageData.data[index + 2] =  Math.random() * 255

@@ -10,18 +10,22 @@ const FEATURES = {
 	REFRACTION: true
 }
 
-const lightOffsets = Array.from({ length: 1 }, () => Vector3DScalar.multiply(Direction3D.random(), 0))
+const skyBoxColor = Color.from('lightblue')
+
+//const lightOffsets = Array.from({ length: 1 }, () => Vector3DScalar.multiply(Direction3D.random(), 0))
+
+
+function shortestDistance(a, b) {
+	return a.distance - b.distance
+}
 
 export function trace(world, ray, type, depth, debug) {
 	if(debug) { console.log(depth, type, ray) }
 
 	const allIntersections = world.objects.map(obj => obj.intersections(ray, debug))
-		// .filter(intersection => intersection.length > 0)
 		.flat(1)
 		.filter(intersection => intersection.distance > 0)
-		.sort((intersectionA, intersectionB) => {
-			return intersectionA.distance - intersectionB.distance
-		})
+		.sort(shortestDistance)
 
 
 	if(debug) { console.log(allIntersections) }
@@ -37,7 +41,7 @@ export function trace(world, ray, type, depth, debug) {
 		// 	return 'crimson'
 		// }
 
-		let reflectionColor = undefined
+		let reflectionColor = undefined // Color.from('white')
 		if(FEATURES.REFLECTION && (intersection.object.material.reflection) && depth > 0) {
 			const incident = intersection.ray.direction
 			const reflectionDirection = Vector3D.subtract(incident, Vector3DScalar.multiply(intersection.normal, 2 * Vector3D.dotProduct(incident, intersection.normal)))
@@ -45,7 +49,7 @@ export function trace(world, ray, type, depth, debug) {
 			reflectionColor = trace(world, reflectionRay, 'REFLECTION', depth - 1, debug)
 		}
 
-		let refractionColor = undefined
+		let refractionColor = undefined // Color.from('white')
 		if(FEATURES.REFRACTION && (intersection.object.material.refraction) && depth > 0) {
 			const indexOfRefraction = intersection.object.material.refraction
 			const INDEX_OF_REFRACTION_FOR_AIR = 1
@@ -68,8 +72,7 @@ export function trace(world, ray, type, depth, debug) {
 			}
 		}
 
-
-
+		const lightOffsets = Array.from({ length: 1 }, () => Vector3DScalar.multiply(Direction3D.random(), 0))
 
 		const lightingInfo = world.lights.map(light => {
 			const primaryLightDirection = Direction3D.from(intersection.at, light.center)
@@ -85,17 +88,12 @@ export function trace(world, ray, type, depth, debug) {
 
 				return world.objects.map(shadowObj => {
 					// if(intersection.object === shadowObj) { return false }
-
 					if(debug) { console.log('shadowRay', depth, shadowRay) }
 
 					const shadowIntersections = shadowObj.intersections(shadowRay)
-						// .filter(intersection => intersection.length > 0)
 						.flat(1)
-						.filter(intersection => intersection.distance > 0)
-						.filter(intersection => intersection.distance < distanceToLight)
-						.sort((intersectionA, intersectionB) => {
-							return intersectionA.distance - intersectionB.distance
-						})
+						.filter(intersection => (intersection.distance > 0) && (intersection.distance < distanceToLight))
+						// .sort(shortestDistance)
 
 					if(debug) { console.log(depth, intersection.object, shadowObj, shadowIntersections) }
 					return shadowIntersections.length > 0
@@ -117,35 +115,14 @@ export function trace(world, ray, type, depth, debug) {
 
 		const lightColors = Color.mix(...lightingInfo.map(info => Shader.phong(intersection, info, debug)))
 
-		// return Color.mix(lightColors)
-		const index = .7
-		return Color.mix(
-			Color.multiply(lightColors, 2),
+		const index = 0.75
+		return Color.sum(
+			Color.multiply(lightColors, .25),
 			Color.sum(
 				Color.multiply(refractionColor, index),
 				Color.multiply(reflectionColor, 1 - index)))
-		// return Color.mix(lightColors, refractionColor, reflectionColor)
 
-		// const [ firstLightInfo ] = lightingInfo
-
-		// if((refractionColor === undefined) && (reflectionColor === undefined)) {
-		// 	return Shader.phong(intersection, firstLightInfo, debug)
-		// }
-
-		// if((reflectionColor === undefined) && (refractionColor !== undefined)) {
-		// 	// firstLightInfo.inShadow = false
-		// 	const shaderColor = Shader.phong(intersection, firstLightInfo, debug)
-		// 	return `color-mix(in lab, ${shaderColor} 50%, ${refractionColor})`
-		// }
-
-		// if((reflectionColor !== undefined) && (refractionColor === undefined)) {
-		// 	const shaderColor = Shader.phong(intersection, firstLightInfo, debug)
-		// 	return `color-mix(in lab, ${shaderColor} 70%, ${reflectionColor})`
-		// }
-
-		// const shaderColor = Shader.phong(intersection, firstLightInfo, debug)
-		// return `color-mix(in lab, color-mix(in lab, ${refractionColor}, ${reflectionColor} 20%), ${shaderColor} 20%)`
 	}
 
-	return Color.from('lightblue')
+	return skyBoxColor
 }

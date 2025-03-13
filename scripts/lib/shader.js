@@ -1,7 +1,7 @@
 import { Color } from './color.js'
-import { Direction3D, Vector3D, Vector3DScalar } from './maths.js'
+import { Direction3D, Vector3D } from './maths.js'
 
-const ambient = 1
+const ambient = .75
 
 const DEFAULT_PHONG_DIFFUSE = .5
 const DEFAULT_PHONG_GLOSS = 1
@@ -34,7 +34,7 @@ export class Shader {
 
 		// return intersection.color
 
-		const color = Color.mix(
+		const color = Color.sum(
 			Color.multiply(intersection.color, ambient),
 			Color.multiply(intersection.color, d),
 			Color.multiply(lightColor, s)
@@ -45,32 +45,18 @@ export class Shader {
 		}
 
 		return color
-
-
-		// const calcR = `calc((${ambient} * r) + (${d} * r))`
-		// const calcG = `calc((${ambient} * g) + (${d} * g))`
-		// const calcB = `calc((${ambient} * b) + (${d} * b))`
-		// const _color = `color(from ${intersection.color} srgb ${calcR} ${calcG} ${calcB})`
-		// const _light = `color(from ${lightColor} srgb calc(${s} * r) calc(${s} * g) calc(${s} * b))`
-		// const color = `color-mix(in lab, ${_color}, ${_light})`
-
-		// return hasShadow ? `color-mix(in lab, black ${lightInfo.shadowPercent * 50}%, ${color})` : color
-
 	}
 
 	static albedo(intersection, lightInfo, debug) {
 		const N = intersection.normal
 		const L = lightInfo.direction
 
-		const albedo = .18
-
+		const albedo = .15
 
 		const x = (albedo / Math.PI) * (lightInfo.intensity * 10) * Math.max(0, Vector3D.dotProduct(N, L))
 		if(debug) { console.log({ x } ) }
 
 		return Color.multiply(intersection.color, x)
-		// const color = `color(from ${intersection.color} srgb calc(r * ${x}) calc(g * ${x}) calc(b * ${x}))`
-		// return color
 	}
 
 	static depth(intersection, lightInfo, debug) {

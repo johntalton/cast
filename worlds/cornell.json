@@ -118,7 +118,7 @@
       "depth": 20,
 
       "transform": [
-        { "rotateY": 45 }
+        { "rotateY": 30 }
       ],
 
       "material": {

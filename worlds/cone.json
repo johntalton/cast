@@ -57,7 +57,9 @@
     {
       "type": "point",
       "center": { "x": 70, "y": 70, "z": -50 },
-      "color": "lemonchiffon"
+      "color": "white",
+			"intensity": 10
+
     }
   ]
 }
